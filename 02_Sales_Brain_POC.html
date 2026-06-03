@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sales Brain — POC Demo</title>
+<style>
+  :root {
+    --bg: #0e1117;
+    --panel: #161b22;
+    --panel-2: #1c2230;
+    --border: #2a3142;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #6366f1;
+    --accent-2: #818cf8;
+    --green: #22c55e;
+    --yellow: #eab308;
+    --red: #ef4444;
+    --red-bg: rgba(239,68,68,0.08);
+    --yellow-bg: rgba(234,179,8,0.08);
+    --green-bg: rgba(34,197,94,0.08);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  .app {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    color: white;
+  }
+  .brand-text h1 { margin: 0; font-size: 18px; font-weight: 700; }
+  .brand-text p { margin: 0; font-size: 12px; color: var(--text-dim); }
+  .header-meta { font-size: 13px; color: var(--text-dim); text-align: right; }
+  .header-meta strong { color: var(--text); display: block; font-size: 15px; }
+
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .kpi {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .kpi-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+  .kpi-value { font-size: 24px; font-weight: 700; margin-top: 4px; }
+  .kpi-sub { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  .kpi-value.red { color: var(--red); }
+  .kpi-value.yellow { color: var(--yellow); }
+  .kpi-value.green { color: var(--green); }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 20px;
+  }
+
+  .deal-list {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 8px;
+    height: fit-content;
+  }
+  .deal-list-header {
+    padding: 12px 12px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .deal-list-header h2 { margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); }
+  .deal-list-header .badge {
+    font-size: 11px;
+    background: var(--panel-2);
+    padding: 3px 8px;
+    border-radius: 10px;
+    color: var(--text-dim);
+  }
+  .deal {
+    padding: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    margin-bottom: 4px;
+    transition: background 0.15s;
+  }
+  .deal:hover { background: var(--panel-2); }
+  .deal.selected {
+    background: var(--panel-2);
+    border-left-color: var(--accent);
+  }
+  .deal-top { display: flex; justify-content: space-between; align-items: center; }
+  .deal-name { font-weight: 600; font-size: 14px; }
+  .deal-amount { font-size: 13px; color: var(--text-dim); }
+  .deal-meta { display: flex; gap: 12px; margin-top: 6px; font-size: 12px; color: var(--text-dim); }
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+  .status-pill.red { background: var(--red-bg); color: var(--red); }
+  .status-pill.yellow { background: var(--yellow-bg); color: var(--yellow); }
+  .status-pill.green { background: var(--green-bg); color: var(--green); }
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .brief {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    min-height: 600px;
+  }
+  .brief-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 500px;
+    color: var(--text-dim);
+    text-align: center;
+  }
+  .brief-empty-icon { font-size: 42px; margin-bottom: 16px; opacity: 0.4; }
+  .brief-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+  .brief-title { font-size: 22px; font-weight: 700; margin: 0; }
+  .brief-sub { color: var(--text-dim); font-size: 13px; margin-top: 4px; }
+  .brief-status-card {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    text-align: center;
+    min-width: 140px;
+  }
+  .brief-status-card.red { background: var(--red-bg); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  .brief-status-card.yellow { background: var(--yellow-bg); color: var(--yellow); border: 1px solid rgba(234,179,8,0.3); }
+  .brief-status-card.green { background: var(--green-bg); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+
+  .section { margin-bottom: 24px; }
+  .section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--text-dim);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .signal-block {
+    background: var(--panel-2);
+    padding: 14px 16px;
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+    line-height: 1.6;
+  }
+  .gap-list { list-style: none; padding: 0; margin: 0; }
+  .gap-list li {
+    padding: 8px 0 8px 24px;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+  .gap-list li:last-child { border-bottom: none; }
+  .gap-list li:before {
+    content: "✕";
+    position: absolute;
+    left: 0;
+    color: var(--red);
+    font-weight: 700;
+  }
+  .action-list { list-style: none; padding: 0; margin: 0; counter-reset: action; }
+  .action-list li {
+    padding: 14px 16px 14px 50px;
+    position: relative;
+    background: var(--panel-2);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    counter-increment: action;
+  }
+  .action-list li:before {
+    content: counter(action);
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .action-day {
+    display: inline-block;
+    background: var(--bg);
+    color: var(--text-dim);
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-right: 8px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .why-you {
+    background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(129,140,248,0.04));
+    padding: 14px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(99,102,241,0.2);
+    font-style: italic;
+    color: var(--accent-2);
+  }
+  .stakeholders {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+  }
+  .stakeholder {
+    background: var(--panel-2);
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+  .stakeholder-name { font-weight: 600; }
+  .stakeholder-role { color: var(--text-dim); margin-top: 2px; }
+  .stakeholder-tag {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+  }
+  .tag-champ { background: var(--green-bg); color: var(--green); }
+  .tag-eb { background: rgba(99,102,241,0.15); color: var(--accent-2); }
+  .tag-cold { background: rgba(139,148,158,0.2); color: var(--text-dim); }
+  .tag-unknown { background: var(--yellow-bg); color: var(--yellow); }
+  .footer-bar {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  .btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 7px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn:hover { background: var(--accent-2); }
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-ghost:hover { background: var(--panel-2); }
+  .footnote {
+    margin-top: 32px;
+    padding: 16px;
+    background: var(--panel-2);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--text-dim);
+    border: 1px dashed var(--border);
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="brand">
+      <div class="brand-logo">SB</div>
+      <div class="brand-text">
+        <h1>Sales Brain</h1>
+        <p>AI Pipeline Coach · Faisal CRM</p>
+      </div>
+    </div>
+    <div class="header-meta">
+      <strong>Monday Morning Brief</strong>
+      May 27, 2026 · 6:00 AM
+    </div>
+  </div>
+
+  <div class="kpi-strip">
+    <div class="kpi">
+      <div class="kpi-label">Open Pipeline</div>
+      <div class="kpi-value">$842K</div>
+      <div class="kpi-sub">23 deals</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Needs You This Week</div>
+      <div class="kpi-value red">3</div>
+      <div class="kpi-sub">deals at risk</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Slipping</div>
+      <div class="kpi-value yellow">5</div>
+      <div class="kpi-sub">close date moved 2+ times</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Suggested Actions</div>
+      <div class="kpi-value">12</div>
+      <div class="kpi-sub">across top 8 deals</div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="deal-list">
+      <div class="deal-list-header">
+        <h2>Priority Deals</h2>
+        <span class="badge">3 of 23</span>
+      </div>
+      <div id="deals"></div>
+    </div>
+
+    <div class="brief" id="brief">
+      <div class="brief-empty">
+        <div class="brief-empty-icon">👈</div>
+        <div>Select a deal to see the coaching brief</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footnote">
+    <strong>Demo note:</strong> This is a static POC for product alignment. In production, coaching briefs are generated by an LLM reasoning over the CRM's structured deal data (output of the AI Stage Classifier). See <code>01_Sales_Brain_Spec.md</code> for the design and <code>03_Sales_Brain_Build_Plan.md</code> for the build.
+  </div>
+</div>
+
+<script>
+const DEALS = [
+  {
+    id: "acme",
+    name: "Acme Corp",
+    amount: "$85K",
+    stage: "Demo Complete",
+    closeDate: "Jun 15",
+    lastContact: "12 days ago",
+    status: "red",
+    statusLabel: "At Risk — Slipping",
+    industry: "Fintech / payments",
+    signal: "Last meaningful contact 12 days ago. Champion (Maria Chen, VP Eng) hasn't responded to your last 2 emails. Decision committee shrunk from 4 active participants in April → 1 today. Close date has moved twice (May 30 → Jun 1 → Jun 15).",
+    gaps: [
+      "No economic buyer identified (Maria reports to ?)",
+      "Close date moved twice — credibility low",
+      "No competing vendor named in your notes (likely 1–2)",
+      "Decision process undefined past procurement"
+    ],
+    actions: [
+      { day: "Mon", text: "Call — not email — Maria. Reference the security question she raised on the May 8 call. Goal: re-open the channel and confirm she's still the buyer-side owner." },
+      { day: "Tue", text: "Ask Maria directly: \"Who else needs to weigh in before we can lock the June 15 date?\" This question almost always surfaces the economic buyer." },
+      { day: "Wed", text: "Send a one-pager comparing us to Plaid and Stripe Treasury (likely competitors given Acme's stack). Lead with the compliance angle — fintech buyers always have this question." },
+      { day: "Fri", text: "If no response by EOD Thursday, send a structured \"close-the-loop\" email — gives Maria an easy way to say no and either revives or kills the deal cleanly." }
+    ],
+    whyYou: "This is your largest deal in Q2 and your manager has zero touches on it yet. The self-rescue window closes in roughly 10 days — after that this becomes a Q3 deal at best, lost at worst.",
+    stakeholders: [
+      { name: "Maria Chen", role: "VP Engineering", tag: "champ", tagText: "Champion (cooling)" },
+      { name: "Dan Park", role: "Director of Eng", tag: "cold", tagText: "Cold — 6 wks" },
+      { name: "Tina Ross", role: "Procurement", tag: "cold", tagText: "Cold — 4 wks" },
+      { name: "?", role: "Economic Buyer", tag: "unknown", tagText: "Unknown" }
+    ]
+  },
+  {
+    id: "northwind",
+    name: "Northwind Logistics",
+    amount: "$140K",
+    stage: "Proposal Sent",
+    closeDate: "Jun 8",
+    lastContact: "2 days ago",
+    status: "yellow",
+    statusLabel: "On Track — Needs Push",
+    industry: "Logistics / supply chain",
+    signal: "Strong engagement across 5 stakeholders. Procurement just opened the security review (a buying signal). However, you haven't asked for or scheduled the close call yet — proposal has been out for 9 days with no defined next step.",
+    gaps: [
+      "No close call scheduled — proposal is aging",
+      "Mutual close plan never confirmed with their procurement team",
+      "Implementation timeline not aligned with their Q3 kickoff (mentioned by Raj on May 14)"
+    ],
+    actions: [
+      { day: "Mon", text: "Email Raj to schedule the close call. Suggest 2 specific times this week — don't ask \"when works?\". Reference their Q3 kickoff date as the reason to move." },
+      { day: "Tue", text: "Loop in your Solutions Engineer to answer the 3 open technical questions from procurement's security review — preempt the back-and-forth." },
+      { day: "Thu", text: "Send a mutual close plan: dates for legal, security, signature, kickoff. This locks the close date AND gives you legitimate reasons to follow up daily." }
+    ],
+    whyYou: "This is a layup if you push it — strong champion, real procurement motion, identified budget. Doing nothing this week pushes it to July.",
+    stakeholders: [
+      { name: "Raj Patel", role: "VP Operations", tag: "champ", tagText: "Champion" },
+      { name: "Linda Cho", role: "CFO", tag: "eb", tagText: "Economic Buyer" },
+      { name: "Marcus Lee", role: "Head of IT", tag: "champ", tagText: "Influencer" },
+      { name: "Sara Kim", role: "Procurement", tag: "champ", tagText: "Active" }
+    ]
+  },
+  {
+    id: "globex",
+    name: "Globex Systems",
+    amount: "$210K",
+    stage: "Discovery",
+    closeDate: "Jul 30",
+    lastContact: "31 days ago",
+    status: "red",
+    statusLabel: "Going Dark",
+    industry: "Manufacturing",
+    signal: "31 days since any meaningful contact. Initial discovery call was strong (Jen Ortiz called us \"exactly what we need\"), but follow-up email thread died after you sent the technical questionnaire. No replies to last 3 outreach attempts. This deal has all the hallmarks of going dark.",
+    gaps: [
+      "Single-threaded — only Jen Ortiz contacted",
+      "No second meeting scheduled after discovery",
+      "Technical questionnaire never returned (sent Apr 26)",
+      "No qualification on budget, timeline, or decision process"
+    ],
+    actions: [
+      { day: "Mon", text: "Try a different channel — LinkedIn message to Jen with a short, specific value point (not \"checking in\"). Reference the 30% efficiency claim she made about her current process." },
+      { day: "Tue", text: "Multi-thread: send a separate outreach to Globex's CTO and Head of Ops. Frame it as \"Jen and I were exploring X, thought this might be relevant to you.\" Don't burn Jen — invite her to the conversation." },
+      { day: "Wed", text: "If no response by Wednesday, send a \"close the loop\" email that makes it easy to say \"not now\" — this is more likely to get a real response than another nudge." },
+      { day: "Thu", text: "Decision time: if still cold by Thursday, move to Closed Lost and free the pipeline slot. A deal this cold at this stage rarely comes back. Be honest with yourself." }
+    ],
+    whyYou: "You've been hoping this comes back for a month. It probably won't. Either re-engage hard this week or close it out — keeping it open is hurting your forecast credibility.",
+    stakeholders: [
+      { name: "Jen Ortiz", role: "Ops Manager", tag: "cold", tagText: "Cold — 31 days" },
+      { name: "?", role: "Decision Maker", tag: "unknown", tagText: "Unknown" }
+    ]
+  }
+];
+
+const tagLabels = { champ: "tag-champ", eb: "tag-eb", cold: "tag-cold", unknown: "tag-unknown" };
+
+function renderDeals() {
+  const container = document.getElementById("deals");
+  container.innerHTML = DEALS.map(d => `
+    <div class="deal" data-id="${d.id}" onclick="selectDeal('${d.id}')">
+      <div class="deal-top">
+        <div class="deal-name">${d.name}</div>
+        <div class="deal-amount">${d.amount}</div>
+      </div>
+      <div class="deal-meta">
+        <span>${d.stage}</span>
+        <span>·</span>
+        <span>Close ${d.closeDate}</span>
+      </div>
+      <div class="status-pill ${d.status}">
+        <span class="status-dot"></span>
+        ${d.statusLabel}
+      </div>
+    </div>
+  `).join("");
+}
+
+function selectDeal(id) {
+  document.querySelectorAll(".deal").forEach(el => el.classList.remove("selected"));
+  document.querySelector(`.deal[data-id="${id}"]`).classList.add("selected");
+
+  const d = DEALS.find(x => x.id === id);
+  const brief = document.getElementById("brief");
+  brief.innerHTML = `
+    <div class="brief-header">
+      <div>
+        <h2 class="brief-title">${d.name} — ${d.amount}</h2>
+        <div class="brief-sub">${d.stage} · Close ${d.closeDate} · ${d.industry} · Last contact ${d.lastContact}</div>
+      </div>
+      <div class="brief-status-card ${d.status}">${d.statusLabel}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Signal</div>
+      <div class="signal-block">${d.signal}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Stakeholder Map</div>
+      <div class="stakeholders">
+        ${d.stakeholders.map(s => `
+          <div class="stakeholder">
+            <div class="stakeholder-name">${s.name}</div>
+            <div class="stakeholder-role">${s.role}</div>
+            <span class="stakeholder-tag ${tagLabels[s.tag]}">${s.tagText}</span>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Qualification Gaps</div>
+      <ul class="gap-list">
+        ${d.gaps.map(g => `<li>${g}</li>`).join("")}
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Do This Week</div>
+      <ol class="action-list">
+        ${d.actions.map(a => `<li><span class="action-day">${a.day}</span>${a.text}</li>`).join("")}
+      </ol>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Why You, Why Now</div>
+      <div class="why-you">${d.whyYou}</div>
+    </div>
+
+    <div class="footer-bar">
+      <button class="btn-ghost btn">Snooze a week</button>
+      <button class="btn-ghost btn">Draft the email</button>
+      <button class="btn">Mark actions done</button>
+    </div>
+  `;
+}
+
+renderDeals();
+// Auto-select first deal so the demo opens with something visible
+selectDeal("acme");
+</script>
+</body>
+</html>

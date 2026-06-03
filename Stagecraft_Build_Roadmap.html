@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stagecraft Build Roadmap</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --ink: #1a1f2e;
+    --ink-soft: #4a5568;
+    --ink-faint: #94a3b8;
+    --accent: #2c5282;
+    --accent-soft: #ebf4ff;
+    --accent-line: #cbd5e0;
+    --gold: #b7791f;
+    --gold-soft: #fefce8;
+    --rust: #9b2c2c;
+    --rust-soft: #fff5f5;
+    --green: #276749;
+    --green-soft: #f0fff4;
+    --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.04);
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.65;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 60px 32px;
+  }
+
+  /* HEADER */
+  .header {
+    margin-bottom: 56px;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 6px 12px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+
+  .subtitle {
+    font-size: 19px;
+    color: var(--ink-soft);
+    max-width: 680px;
+    line-height: 1.55;
+  }
+
+  /* STATS GRID */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 40px 0 56px;
+  }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--accent-line);
+    border-radius: var(--radius);
+    padding: 20px 18px;
+    text-align: left;
+  }
+
+  .stat-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 56px;
+  }
+
+  h2 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--ink-faint);
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--accent-line);
+  }
+
+  h3 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  p { margin-bottom: 14px; color: var(--ink-soft); }
+  p strong { color: var(--ink); font-weight: 600; }
+
+  /* PRINCIPLE CARDS */
+  .principles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .principle {
+    background: var(--surface);
+    border: 1px solid var(--accent-line);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+  }
+
+  .principle-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .principle-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .principle-body {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+
+  /* PHASE TIMELINE */
+  .phase {
+    background: var(--surface);
+    border: 1px solid var(--accent-line);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+
+  .phase-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--accent-line);
+  }
+
+  .phase-num {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 6px 12px;
+    border-radius: 6px;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+
+  .phase-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+    flex-grow: 1;
+  }
+
+  .phase-time {
+    font-size: 13px;
+    color: var(--ink-faint);
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .phase-goal {
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    padding: 14px 18px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: var(--ink);
+  }
+
+  .phase-goal strong {
+    color: var(--accent);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin-right: 8px;
+  }
+
+  .phase ol, .phase ul {
+    margin-left: 22px;
+    margin-bottom: 16px;
+  }
+
+  .phase li {
+    margin-bottom: 8px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+
+  .phase li strong { color: var(--ink); }
+
+  .phase h4 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--ink-faint);
+    margin: 20px 0 10px;
+    font-weight: 600;
+  }
+
+  .deliverable {
+    background: var(--green-soft);
+    border-left: 3px solid var(--green);
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--ink);
+  }
+
+  .deliverable strong {
+    color: var(--green);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin-right: 8px;
+  }
+
+  /* HIGHLIGHT PHASE (Phase 2) */
+  .phase.hero {
+    border: 2px solid var(--accent);
+    background: linear-gradient(180deg, #fafaff 0%, #ffffff 100%);
+  }
+
+  .phase.hero::before {
+    content: "★ Most Important Phase";
+    position: absolute;
+    top: -12px;
+    right: 24px;
+    background: var(--accent);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* TOOL STACK TABLE */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    font-size: 14px;
+  }
+
+  th {
+    background: var(--ink);
+    color: white;
+    text-align: left;
+    padding: 12px 18px;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  td {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--accent-line);
+    color: var(--ink-soft);
+  }
+
+  td:first-child {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  /* RISK CARDS */
+  .risks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .risk {
+    background: var(--rust-soft);
+    border-left: 3px solid var(--rust);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+  }
+
+  .risk-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--rust);
+    margin-bottom: 8px;
+  }
+
+  .risk-body {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+
+  .risk-body strong { color: var(--ink); }
+
+  /* MILESTONE BOX */
+  .milestone {
+    background: var(--gold-soft);
+    border: 1px solid var(--gold);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 24px;
+  }
+
+  .milestone-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+
+  .milestone h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+
+  .milestone ul {
+    margin-left: 20px;
+    margin-top: 12px;
+  }
+
+  .milestone li {
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+
+  /* BOTTOM LINE */
+  .bottom-line {
+    background: var(--ink);
+    color: white;
+    padding: 36px;
+    border-radius: var(--radius);
+    margin-top: 40px;
+  }
+
+  .bottom-line h3 {
+    color: white;
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+
+  .bottom-line p {
+    color: rgba(255,255,255,0.85);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* FOOTER */
+  .footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid var(--accent-line);
+    font-size: 12px;
+    color: var(--ink-faint);
+    text-align: center;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 720px) {
+    .container { padding: 32px 20px; }
+    h1 { font-size: 34px; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .principles, .risks { grid-template-columns: 1fr; }
+    .phase-head { flex-wrap: wrap; }
+  }
+
+  /* PRINT */
+  @media print {
+    body { background: white; font-size: 11pt; }
+    .container { padding: 0; max-width: 100%; }
+    .phase, .stat, .principle, .risk, .milestone { box-shadow: none; page-break-inside: avoid; }
+    .phase.hero::before { display: none; }
+    h1 { font-size: 28pt; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="tag">Build Roadmap · v1.0</div>
+    <h1>Stagecraft Build Roadmap</h1>
+    <p class="subtitle">A step-by-step plan for building the AI stage classifier — the core feature of Stagecraft's POC — from zero to a demoable product in eight weeks of focused work, for under one hundred dollars.</p>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value">8 wks</div>
+        <div class="stat-label">Part-time build</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">$100</div>
+        <div class="stat-label">Total cost</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">6</div>
+        <div class="stat-label">Build phases</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">80%</div>
+        <div class="stat-label">Accuracy target</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CORE PRINCIPLES -->
+  <section class="section">
+    <h2>Core Principles</h2>
+    <p style="margin-bottom: 20px;">Internalize these before starting any phase. They are the load-bearing ideas — every phase decision flows from them.</p>
+
+    <div class="principles">
+      <div class="principle">
+        <div class="principle-num">PRINCIPLE 01</div>
+        <div class="principle-title">Prompt &gt; Code</div>
+        <div class="principle-body">80% of the product's value lives in the prompt that tells the LLM how to reason. Wrapper code is the easy 20% — AI coding assistants write it for you. Spend your time on the prompt.</div>
+      </div>
+
+      <div class="principle">
+        <div class="principle-num">PRINCIPLE 02</div>
+        <div class="principle-title">Faisal in the loop</div>
+        <div class="principle-body">You cannot define "what stage is this deal at" alone. That's domain expertise Faisal has and you don't. Prompt iteration is a collaboration, not a solo build. Block his calendar weekly.</div>
+      </div>
+
+      <div class="principle">
+        <div class="principle-num">PRINCIPLE 03</div>
+        <div class="principle-title">Test set before prompt</div>
+        <div class="principle-body">Build 25–30 example meeting notes with "correct" answers labeled before writing the prompt. This is your ground truth. Without it, you're flying blind on every iteration.</div>
+      </div>
+
+      <div class="principle">
+        <div class="principle-num">PRINCIPLE 04</div>
+        <div class="principle-title">No scope creep</div>
+        <div class="principle-body">Only the stage classifier. No contacts database, pipeline view, dashboards, integrations, or auth. Every "wouldn't it be cool if" is a delay that kills the POC. Discipline beats ambition.</div>
+      </div>
+
+      <div class="principle">
+        <div class="principle-num">PRINCIPLE 05</div>
+        <div class="principle-title">Demo before optimize</div>
+        <div class="principle-body">Get something Faisal can show to sales leaders within 6–8 weeks. Polish comes after validation, not before. A rough demo with real customer reaction beats a perfect demo with no audience.</div>
+      </div>
+
+      <div class="principle">
+        <div class="principle-num">PRINCIPLE 06</div>
+        <div class="principle-title">Measurable wins only</div>
+        <div class="principle-body">Every phase has a specific deliverable. If you can't point to the deliverable, the phase isn't done. "We made progress" is not a deliverable.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PHASES -->
+  <section class="section">
+    <h2>The Six Phases</h2>
+
+    <!-- PHASE 0 -->
+    <div class="phase">
+      <div class="phase-head">
+        <div class="phase-num">PHASE 00</div>
+        <div class="phase-title">Setup</div>
+        <div class="phase-time">Days 1–2</div>
+      </div>
+      <div class="phase-goal"><strong>Goal</strong>Working dev environment, confirmed API access.</div>
+
+      <h4>Steps</h4>
+      <ol>
+        <li>Create a project folder: <code>C:\Users\WOLF\Documents\Stagecraft-POC\</code> with subfolders <code>prompts/</code>, <code>test_data/</code>, <code>code/</code>, <code>output_samples/</code></li>
+        <li>Confirm DeepSeek API still works — re-run the PowerShell test from earlier</li>
+        <li>Install <strong>Cursor</strong> (cursor.sh) or <strong>Claude Code</strong> (claude.com/code) — AI coding assistants that build by description. Pick one.</li>
+        <li>Sign up for <strong>Lovable</strong> (lovable.dev) and <strong>Bolt</strong> (bolt.new) free tiers — you'll use one to generate the UI later.</li>
+      </ol>
+
+      <h4>What to learn</h4>
+      <ul>
+        <li>How to make an API call to DeepSeek (your PowerShell test counts)</li>
+        <li>Basic interaction with Cursor or Claude Code — type what you want, review what it writes</li>
+      </ul>
+
+      <div class="deliverable"><strong>Done when</strong>You can call DeepSeek's API from a script and get a response back.</div>
+    </div>
+
+    <!-- PHASE 1 -->
+    <div class="phase">
+      <div class="phase-head">
+        <div class="phase-num">PHASE 01</div>
+        <div class="phase-title">Build the Test Set</div>
+        <div class="phase-time">Days 3–5</div>
+      </div>
+      <div class="phase-goal"><strong>Goal</strong>25–30 realistic meeting note samples, each labeled with the "correct" answer.</div>
+
+      <p><strong>This is mostly Faisal's work.</strong> You facilitate, he provides the domain content.</p>
+
+      <h4>Steps</h4>
+      <ol>
+        <li>Pick the vertical Faisal commits to at the partner meeting (e.g., biotech BD)</li>
+        <li>Define 5–7 sales stages with criteria, using MEDDIC as the default framework</li>
+        <li>Faisal drafts 25–30 sample meeting notes (100–300 words each), spanning early-stage, deep negotiation, stalled, ambiguous</li>
+        <li>For each note, Faisal writes the answer key: which stage, why, what's missing, what next action</li>
+        <li>Save as JSON or markdown in <code>test_data/</code></li>
+      </ol>
+
+      <h4>Why this matters</h4>
+      <p>Without ground truth, you can't tell if a prompt is good or bad. With it, every iteration is measurable.</p>
+
+      <div class="deliverable"><strong>Done when</strong><code>test_data/sample_meetings.json</code> exists with 25–30 labeled examples.</div>
+    </div>
+
+    <!-- PHASE 2 - HERO -->
+    <div class="phase hero">
+      <div class="phase-head">
+        <div class="phase-num">PHASE 02</div>
+        <div class="phase-title">Prompt Engineering</div>
+        <div class="phase-time">Weeks 2–3</div>
+      </div>
+      <div class="phase-goal"><strong>Goal</strong>A prompt that returns the correct structured stage judgment 80%+ of the time on the test set.</div>
+
+      <p><strong>This is the heart of the project.</strong> Spend more time here than anywhere else. Most days of these two weeks should be iterating on the prompt with Faisal at your side or on call.</p>
+
+      <h4>Steps</h4>
+      <ol>
+        <li>Write the initial system prompt with: stage definitions, framework criteria (MEDDIC's 6 elements), output structure, reasoning instructions, 1–2 worked examples (few-shot prompting)</li>
+        <li>Write an evaluation script that: loads test set → calls DeepSeek for each sample → saves response → compares to answer key → reports accuracy</li>
+        <li>Run, review failures with Faisal, adjust prompt, re-run. Repeat.</li>
+        <li>Lock when you hit 80%+ accuracy AND Faisal agrees reasoning quality matches "what I'd say in a pipeline review"</li>
+      </ol>
+
+      <h4>Common failures and fixes</h4>
+      <ul>
+        <li><strong>AI hallucinates evidence not in notes</strong> → add "Only cite specific phrases from the notes. Do not invent details."</li>
+        <li><strong>AI is too confident</strong> → add "If 2+ MEDDIC criteria are missing, confidence cannot exceed 60."</li>
+        <li><strong>AI ignores the framework</strong> → restructure prompt: framework eval first, stage assignment second</li>
+        <li><strong>Output structure inconsistent</strong> → use DeepSeek's <code>response_format={"type": "json_object"}</code> with a schema in the prompt</li>
+      </ul>
+
+      <h4>What to learn</h4>
+      <ul>
+        <li>How LLMs follow structured prompts (Anthropic's prompt engineering guide applies)</li>
+        <li>Few-shot prompting (examples inside the prompt)</li>
+        <li>Structured output with JSON mode</li>
+        <li>Writing evaluation scripts in Python with the <code>openai</code> library (DeepSeek is OpenAI-compatible)</li>
+      </ul>
+
+      <div class="deliverable"><strong>Done when</strong><code>prompts/v1.0_locked.md</code> exists + evaluation script proves 80%+ accuracy on the test set.</div>
+    </div>
+
+    <!-- PHASE 3 -->
+    <div class="phase">
+      <div class="phase-head">
+        <div class="phase-num">PHASE 03</div>
+        <div class="phase-title">Build the Core API Function</div>
+        <div class="phase-time">Week 4</div>
+      </div>
+      <div class="phase-goal"><strong>Goal</strong>A single function that takes meeting notes + company config, returns the structured judgment. No UI yet.</div>
+
+      <h4>Steps</h4>
+      <ol>
+        <li>Refactor the Phase 2 script into a clean reusable function. Inputs: notes string, config object. Output: structured JSON.</li>
+        <li>Wrap as a serverless function on Vercel (Next.js or plain Node.js handler)</li>
+        <li>Test the endpoint with curl or Postman</li>
+        <li>Add basic error handling: malformed JSON, empty notes, rate limits, bad API key — don't over-engineer, just don't crash</li>
+      </ol>
+
+      <h4>What to learn</h4>
+      <ul>
+        <li>What a serverless function is (cloud function called via HTTP — Vercel makes this easy)</li>
+        <li>How to deploy to Vercel (push to GitHub, auto-deploy — about 30 min to learn)</li>
+        <li>Testing API endpoints with Postman or curl</li>
+      </ul>
+
+      <div class="deliverable"><strong>Done when</strong>A live URL like <code>https://stagecraft-poc.vercel.app/api/classify</code> returns a structured judgment when called.</div>
+    </div>
+
+    <!-- PHASE 4 -->
+    <div class="phase">
+      <div class="phase-head">
+        <div class="phase-num">PHASE 04</div>
+        <div class="phase-title">Build the UI</div>
+        <div class="phase-time">Weeks 5–6</div>
+      </div>
+      <div class="phase-goal"><strong>Goal</strong>A simple, demo-ready web app that wraps the API function. Lovable or Bolt earns its keep here.</div>
+
+      <p><strong>Don't write React from scratch.</strong> Describe what you want and let the AI build it.</p>
+
+      <h4>Steps</h4>
+      <ol>
+        <li>Open Lovable and describe the app in plain English (sample prompt below)</li>
+        <li>Iterate: AI generates code → you preview → say "make output card bigger, add copy button" → repeat</li>
+        <li>Hard-code 2–3 example companies in the setup screen so demos work without configuration</li>
+        <li>Hard-code 3–5 example meeting notes the rep can load with one click</li>
+        <li>Connect UI to your Vercel API endpoint from Phase 3</li>
+        <li>Test end-to-end: pick company → load sample note → click Analyze → see AI response</li>
+      </ol>
+
+      <h4>Sample Lovable prompt to start with</h4>
+      <p style="background: var(--bg); padding: 16px; border-radius: 8px; font-size: 14px; border-left: 3px solid var(--accent); margin-top: 8px;">"Build a sales CRM POC web app with three screens: (1) Setup — configure company stages and choose framework (MEDDIC/SPIN/BANT). (2) Input — large text box for meeting notes plus Analyze button. (3) Output — shows deal stage with confidence badge, plain-English reasoning, confirmed/missing framework criteria, recommended next action, risk flags. Clean professional dark mode. Analyze button calls the API at [your Vercel URL]."</p>
+
+      <div class="deliverable"><strong>Done when</strong>Faisal can do a live screen-share demo without embarrassing either of you.</div>
+    </div>
+
+    <!-- PHASE 5 -->
+    <div class="phase">
+      <div class="phase-head">
+        <div class="phase-num">PHASE 05</div>
+        <div class="phase-title">Polish for Demo</div>
+        <div class="phase-time">Week 7</div>
+      </div>
+      <div class="phase-goal"><strong>Goal</strong>The POC is reliable enough for live demos to real prospects.</div>
+
+      <h4>Steps</h4>
+      <ol>
+        <li>Test the full flow 20 times in a row. Anything that breaks → fix.</li>
+        <li>Add a graceful fallback if DeepSeek is slow or fails</li>
+        <li>Ensure HTTPS works (Vercel does this automatically) and the UI works on mobile</li>
+        <li>Take screenshots of the most impressive runs for the pitch deck</li>
+        <li>Write a 2-minute demo script for Faisal</li>
+        <li>Practice the demo with Faisal 5–10 times before he shows anyone real</li>
+      </ol>
+
+      <div class="deliverable"><strong>Done when</strong>Faisal can confidently put the demo URL in front of a sales leader.</div>
+    </div>
+
+    <!-- PHASE 6 -->
+    <div class="phase">
+      <div class="phase-head">
+        <div class="phase-num">PHASE 06</div>
+        <div class="phase-title">Validation Demos</div>
+        <div class="phase-time">Week 8 — Faisal-led</div>
+      </div>
+      <div class="phase-goal"><strong>Goal</strong>Get the POC in front of 10 sales leaders and learn what they actually think.</div>
+
+      <p><strong>This phase is Faisal's domain.</strong> You support by being on the demos to take notes, iterating on the prompt or UI based on consistent feedback, tracking what works in a simple spreadsheet, and updating mirofish quarterly to see if probability moves.</p>
+
+      <h4>What you learn</h4>
+      <ul>
+        <li>What sales leaders actually care about (often different from what you assumed)</li>
+        <li>Which parts of the demo land and which fall flat</li>
+        <li>Whether the rep-narrative-input thesis holds against real customer questions</li>
+      </ul>
+
+      <div class="deliverable"><strong>Done when</strong>Either signed pilot agreements (best case) or specific learning about what needs to change before continuing.</div>
+    </div>
+  </section>
+
+  <!-- TOOL STACK -->
+  <section class="section">
+    <h2>Tool Stack</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Phase</th>
+          <th>Tool</th>
+          <th>Cost</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Setup</td><td>Cursor or Claude Code</td><td>Free / $20/mo</td><td>AI coding assistant for wrapper code</td></tr>
+        <tr><td>Prompt Eng</td><td>DeepSeek API</td><td>~$5–10 total</td><td>LLM that interprets meeting notes</td></tr>
+        <tr><td>Code</td><td>Python or Node.js</td><td>Free</td><td>Evaluation scripts</td></tr>
+        <tr><td>API</td><td>Vercel Functions</td><td>Free tier</td><td>Hosts your serverless API</td></tr>
+        <tr><td>UI</td><td>Lovable or Bolt</td><td>Free / $20/mo</td><td>Generates UI from descriptions</td></tr>
+        <tr><td>Hosting</td><td>Vercel</td><td>Free tier</td><td>Hosts both API and UI on one URL</td></tr>
+        <tr><td>Storage</td><td>Hard-coded JSON</td><td>Free</td><td>No database needed for POC</td></tr>
+        <tr><td>Domain (optional)</td><td>Namecheap</td><td>~$12/year</td><td>If you want a custom URL</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top: 16px; font-size: 14px; color: var(--ink-faint);">Total recurring cost during build: <strong style="color: var(--ink);">$20–40/month</strong>. One-time API testing: <strong style="color: var(--ink);">under $20</strong>.</p>
+  </section>
+
+  <!-- WHAT COULD GO WRONG -->
+  <section class="section">
+    <h2>What Could Go Wrong</h2>
+
+    <div class="risks">
+      <div class="risk">
+        <div class="risk-title">Prompt accuracy plateaus at 60%</div>
+        <div class="risk-body">After 6 weeks of focused work. Means the AI can't reason about deals well enough. <strong>Action:</strong> Talk to Faisal. Decide: sharpen test set, simplify framework, or pivot product. Don't iterate blindly — the thesis itself is at risk.</div>
+      </div>
+
+      <div class="risk">
+        <div class="risk-title">Lovable/Bolt breaks on every change</div>
+        <div class="risk-body">Common with AI UI generators. <strong>Action:</strong> Switch tools (try the other one). Or have Cursor/Claude Code write React directly — slower but more controllable.</div>
+      </div>
+
+      <div class="risk">
+        <div class="risk-title">Faisal can't sit for prompt iteration</div>
+        <div class="risk-body">The project-killing risk. <strong>Action:</strong> Schedule in advance, treat as non-negotiable. If Faisal can't commit 3–5 hrs/week for 3 weeks, the project doesn't have a future.</div>
+      </div>
+
+      <div class="risk">
+        <div class="risk-title">DeepSeek breaks your integration</div>
+        <div class="risk-body">API changes happen. <strong>Action:</strong> Switch to another OpenAI-compatible provider (OpenRouter is easiest — routes to dozens of models through one API). Code shouldn't need major changes.</div>
+      </div>
+
+      <div class="risk">
+        <div class="risk-title">Hit Vercel free tier limits</div>
+        <div class="risk-body">Won't happen during POC — free tier is generous. <strong>Action:</strong> None needed until you have real traffic.</div>
+      </div>
+
+      <div class="risk">
+        <div class="risk-title">Demo is great but no one bites</div>
+        <div class="risk-body">Actually the <strong>best</strong> outcome of the POC — you learned truth cheaply. Either wedge is wrong, vertical is wrong, or pitch is wrong. Faisal pivots based on what they say no to.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MILESTONE / MIROFISH -->
+  <section class="section">
+    <h2>When to Re-Run Mirofish</h2>
+    <div class="milestone">
+      <div class="milestone-label">Quarterly Check-In</div>
+      <h3>Re-run the simulation at each milestone</h3>
+      <p>The probability number should rise as preconditions get met. If it isn't rising, something is wrong with execution and you need to inspect what.</p>
+      <ul>
+        <li>After the partner meeting — capture new commitments, see probability shift</li>
+        <li>End of Phase 2 (prompt accuracy locked) — does technical validation move it?</li>
+        <li>End of Phase 6 (after 10 demos) — biggest moment; market feedback moves the number meaningfully</li>
+        <li>Anytime vertical, distribution strategy, or partnership terms change</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BOTTOM LINE -->
+  <section class="section">
+    <h2>Bottom Line</h2>
+    <div class="bottom-line">
+      <h3>Eight weeks. Under $100. Real demo at the end.</h3>
+      <p>The hard part isn't the code — it's the discipline to keep scope tight, keep Faisal at the table for prompt iteration, and ship something demoable instead of something perfect. If both of you commit to those three things at tomorrow's meeting, the build itself is achievable.</p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    Stagecraft Build Roadmap · v1.0 · Drafted 2026-05-26 · Working name, not final brand
+  </footer>
+
+</div>
+</body>
+</html>

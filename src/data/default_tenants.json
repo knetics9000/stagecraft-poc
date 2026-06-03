@@ -1,0 +1,132 @@
+[
+  {
+    "id": "jove-academic",
+    "name": "JoVE Research (Academic Sales)",
+    "industry": "Scientific Video & Education Sales",
+    "activeFramework": "meddic",
+    "stages": [
+      {
+        "name": "Discovery",
+        "description": "Initial outreach, identifying academic department needs, and scoping institutional interest.",
+        "entry_criteria": "Contact established with university library or science department faculty.",
+        "exit_criteria": "Faculty pain identified; key contacts mapped."
+      },
+      {
+        "name": "Evaluation",
+        "description": "Running department-wide trial access, collecting trial usage stats, and gathering user feedback.",
+        "entry_criteria": "Trial access approved and set up for the institution.",
+        "exit_criteria": "Trial completed; usage data analyzed showing positive researcher engagement."
+      },
+      {
+        "name": "C - Proposition",
+        "description": "Submitting customized subscription proposals, matching package requirements, and aligning pricing models.",
+        "entry_criteria": "Proposal request received; subscription package tiered.",
+        "exit_criteria": "Proposal sent and reviewed; pricing structure aligned with library dean."
+      },
+      {
+        "name": "B - Validation",
+        "description": "Legal agreement redlines, IT compliance audits, and securing department champion approvals.",
+        "entry_criteria": "Contract draft sent to university procurement or legal department.",
+        "exit_criteria": "Legal terms cleared; IT integration and compliance checks passed."
+      },
+      {
+        "name": "A - Booking",
+        "description": "Securing library dean signature, invoice generation, and processing order forms.",
+        "entry_criteria": "Approved contract sent for final signature.",
+        "exit_criteria": "Signed agreement on file; finance approved."
+      },
+      {
+        "name": "Closed",
+        "description": "Access initialized and hand-off to Customer Success for onboarding.",
+        "entry_criteria": "Payment processed or purchase order issued.",
+        "exit_criteria": "Welcome package sent; institutional access active."
+      }
+    ],
+    "sampleMeetings": [
+      {
+        "label": "UAH Upgrade - C - Proposition",
+        "notes": "4/23: Met w/ Laura and David from Lib. explained need to upgrade- esp add Phy and Eng. Explained Unl going away and incremental add ons not a good decision financially. They asked us not to offer trials again. They know Will Waldron wants and they know Nursing was free. We discussed PathoPhys We looked at diff bw Edu and Res. Sent Pricing. David meets w/ Provost Monthly. 4/16: Reached out to Laura S to make meeting for week of 4/20 to review the Spr semester usage (to really discuss plan for going forward). Will Waldron and Michelle Greene making case to Lib to add. Laura and David know Unl will be helpful but they are very budget conscious. Pricing package was sent for $46,282.50. Next Steps: David will present physics/engineering champion feedback to the Provost at their monthly meeting next week. I will follow up with Laura to address any budget pushback and offer a multi-year lock."
+      },
+      {
+        "label": "Atlanta Woodruff Library - B - Validation",
+        "notes": "1.28.2026 - Hosted a Lunch and Learn session to engage faculty and walk them through what is now available and how to use. Faculty from many different disciplines, including Business and Physiology, attended and asked that the library look into JoVE Business and Core: A&P. The Director of the Business School is interested in JoVE Business for remediation at all levels. I secured a recommendation and set up a trial for her. She said she is going to demo JoVE to her faculty and let me know the next steps. 3.9.2026 - Received recommendations from the Director and Program Director of Business School at Clark Atlanta University for JoVE Business. The Social Sciences Librarian at the Atlanta University Center Library reached out to the Director of the Library and me to share these recommendations and the interest from the faculty. The Director of the Library said that he would connect with the Social Sciences Librarian before making any decisions about adding new collections. The AUC Consortium is on Spring break this week, but going to send outreach and visit Morehouse Business faculty to secure their advocacy and put pressure on the library. 03.25.2026 - Library asks to meet with me following strong recommendations from Business faculty and A&P faculty. During the meeting, we discussed pricing for JoVE Business and Core: A&P. I proposed an upgrade subscription package at $52,900.00. The Director, Dr. Terrence Martin, wants to move forward but requested the standard agreement be sent to university legal counsel Valdoshia Hunt to review our IP ownership terms. Next step: Follow up with Terrence and Val in the library following HBCU roundtable on 05/27 about Chem and Environment bundle."
+      }
+    ]
+  },
+  {
+    "id": "healthcare-sales",
+    "name": "HealthOptima Systems",
+    "industry": "Healthcare Enterprise Software",
+    "activeFramework": "bant",
+    "stages": [
+      {
+        "name": "Lead Qualification",
+        "description": "Identifying clinical pain, checking budget cycles, and mapping clinical department leaders.",
+        "entry_criteria": "Inbound lead or cold outreach response expressing interest.",
+        "exit_criteria": "Confirmed clinical need and mapped key department stakeholders."
+      },
+      {
+        "name": "Solution Evaluation",
+        "description": "Presenting the platform, engaging IT security/compliance, and achieving department buy-in.",
+        "entry_criteria": "Demo scheduled and completed with department heads.",
+        "exit_criteria": "Clinical team consensus achieved; IT security review initiated."
+      },
+      {
+        "name": "Proposal & Negotiation",
+        "description": "Submitting pricing proposals, negotiating multi-year licenses, and navigating procurement.",
+        "entry_criteria": "Pricing proposal requested and submitted.",
+        "exit_criteria": "Pricing and contract terms agreed by department head; sent to purchasing."
+      },
+      {
+        "name": "Closing",
+        "description": "Purchasing department review, VP of Finance signature, and implementation scheduling.",
+        "entry_criteria": "Agreement is in procurement/finance queue.",
+        "exit_criteria": "Fully signed contract received; implementation kick-off scheduled."
+      }
+    ],
+    "sampleMeetings": [
+      {
+        "label": "Qualified Clinical Lead",
+        "notes": "Had a first call with Dr. Marcus, Chief of Cardiology at Valley Health. They are struggling with patient scheduling inefficiencies, which leads to a 15% rate of missed appointments. He confirmed they have a budget of up to $30K allocated for administrative software this fiscal year, ending in December. He is the decision-maker for the department, but the final contract will need to go through hospital procurement. He wants to see a live demo of the scheduling module with his operations team. We scheduled the demo for June 8."
+      }
+    ]
+  },
+  {
+    "id": "legal-services",
+    "name": "LexCounsel Solutions",
+    "industry": "Legal Retainers & Advisory",
+    "activeFramework": "spin",
+    "stages": [
+      {
+        "name": "Initial Consultation",
+        "description": "Understanding client situation, current litigation risk, and scoping legal advisory needs.",
+        "entry_criteria": "Client schedules consultation or requests introductory call.",
+        "exit_criteria": "Identified core legal issues and litigation/IP risk profile."
+      },
+      {
+        "name": "Proposal & Alignment",
+        "description": "Presenting retainer structures, scope of counsel, and aligning partner-level buy-in.",
+        "entry_criteria": "Retainer options drafted and shared with prospect.",
+        "exit_criteria": "Retainer scope and pricing aligned; agreement drafted."
+      },
+      {
+        "name": "Retainer Approval",
+        "description": "Prospect reviewing engagement letter, billing terms, and conflicts clearing.",
+        "entry_criteria": "Formal engagement letter sent to prospect.",
+        "exit_criteria": "Conflict check cleared; terms approved."
+      },
+      {
+        "name": "Engagement Started",
+        "description": "Retainer payment processed, signed engagement letter on file.",
+        "entry_criteria": "Engagement letter signed by both parties.",
+        "exit_criteria": "Retainer invoice paid; legal files initialized."
+      }
+    ],
+    "sampleMeetings": [
+      {
+        "label": "Consultation - High IP Risk",
+        "notes": "Met with Thomas, CEO of Apex Labs. They are facing a potential patent infringement threat from a larger competitor and need an external firm to draft a freedom-to-operate (FTO) opinion and represent them in defensive discussions. Thomas was highly stressed, explaining that if they get sued, it could derail their Series A funding round which closes in 45 days. I gathered details on their patent portfolio and the competitor's claims. I explained that an FTO opinion takes 2-3 weeks and costs $15-20K. Thomas said the cost is irrelevant compared to the funding round risk, and urged us to start immediately. I told him we must clear conflicts first and sign an engagement letter. Next steps: Run internal conflict check and draft engagement letter with a $15K retainer requirement today."
+      }
+    ]
+  }
+]

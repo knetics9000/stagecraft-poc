@@ -1,0 +1,1086 @@
+/* Salesforce Lightning Theme Replica for Stagecraft POC */
+
+:root {
+  --font-heading: 'Salesforce Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  --bg-page: #f3f2f1; /* Classic Salesforce Lightning background */
+  --bg-card: #ffffff;
+  --bg-header: #f8f9fa;
+  
+  --border-color: #dddbda; /* Salesforce standard border grey */
+  --border-radius: 4px;
+  
+  --text-main: #181818;
+  --text-muted: #514f4d;
+  --text-link: #0070d2;
+  --text-white: #ffffff;
+  
+  /* Salesforce chevron path colors */
+  --color-completed: #2e844a;
+  --color-active: #0176d3;
+  --color-future: #f3f2f1;
+  --color-future-text: #181818;
+  
+  --color-brand: #0176d3;
+  --color-success: #2e844a;
+  --color-warning: #b78103;
+  --color-danger: #ea001e;
+  
+  --shadow-card: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+  --transition-fast: 0.15s ease-in-out;
+}
+
+/* Base resets */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* Top Branding Nav Bar (JoVE Salesforce Screenshot alignment) */
+.sf-navbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 1.5rem;
+  height: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sf-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  height: 100%;
+}
+
+.sf-brand {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.6rem;
+  color: #0b2240; /* JoVE deep blue */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sf-brand-tag {
+  font-size: 0.65rem;
+  background-color: #f3f2f1;
+  color: var(--text-link);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  font-weight: 600;
+}
+
+.sf-nav-links {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  gap: 0.5rem;
+  height: 100%;
+}
+
+.sf-nav-link {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0 0.75rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+  transition: var(--transition-fast);
+}
+
+.sf-nav-link.active {
+  color: var(--text-main);
+  font-weight: bold;
+}
+
+.sf-nav-link.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0.75rem;
+  right: 0.75rem;
+  height: 3px;
+  background-color: var(--color-brand);
+}
+
+.sf-nav-link:hover:not(.active) {
+  color: var(--text-link);
+  background-color: #f3f2f1;
+}
+
+.sf-search-container {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  width: 320px;
+  padding: 0.25rem 0.75rem;
+}
+
+.sf-search-input {
+  border: none;
+  outline: none;
+  font-size: 0.8rem;
+  width: 100%;
+  padding-left: 0.5rem;
+}
+
+/* Salesforce lightning global utility strip */
+.sf-utility-bar {
+  background-color: #0b0f19;
+  color: #94a3b8;
+  height: 32px;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sf-utility-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* App Workspace Container */
+.app-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Salesforce Opportunity Card (Light mode header) */
+.opportunity-header-card {
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-card);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.opp-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.opp-badge-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.opp-icon {
+  background-color: #fc7b22; /* Salesforce Opportunity orange */
+  width: 32px;
+  height: 32px;
+  border-radius: 3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
+}
+
+.opp-label-group span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.opp-label-group h2 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--text-main);
+  margin-top: -0.1rem;
+}
+
+.opp-action-buttons {
+  display: flex;
+  gap: 0.4rem;
+}
+
+/* Salesforce classic buttons */
+.btn-sf {
+  background-color: #ffffff;
+  border: 1px solid #c9c9c9;
+  color: var(--text-link);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btn-sf:hover {
+  background-color: #f3f2f1;
+  border-color: #b0b0b0;
+}
+
+.btn-sf-primary {
+  background-color: var(--color-brand);
+  color: #ffffff;
+  border: 1px solid var(--color-brand);
+}
+
+.btn-sf-primary:hover {
+  background-color: #015ba2;
+  border-color: #015ba2;
+  color: #ffffff;
+}
+
+/* Metadata grid bar */
+.opp-metadata-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+  padding-top: 0.5rem;
+}
+
+.metadata-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.metadata-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 0.15rem;
+}
+
+.metadata-value {
+  font-size: 0.85rem;
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.metadata-value.link {
+  color: var(--text-link);
+  cursor: pointer;
+}
+
+.metadata-value.link:hover {
+  text-decoration: underline;
+}
+
+/* Chevron path progression bar (Screenshot 3 alignment) */
+.chevron-path {
+  display: flex;
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  margin-top: 0.25rem;
+  background-color: #ffffff;
+}
+
+.chevron-step {
+  flex: 1;
+  padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  clip-path: polygon(0% 0%, calc(100% - 8px) 0%, 100% 50%, calc(100% - 8px) 100%, 0% 100%, 8px 50%);
+  margin-left: -7px;
+  transition: var(--transition-fast);
+}
+
+.chevron-step:first-child {
+  clip-path: polygon(0% 0%, calc(100% - 8px) 0%, 100% 50%, calc(100% - 8px) 100%, 0% 100%);
+  margin-left: 0;
+  padding-left: 0.75rem;
+}
+
+.chevron-step.completed {
+  background-color: var(--color-completed);
+  color: var(--text-white);
+}
+
+.chevron-step.active {
+  background-color: var(--color-active);
+  color: var(--text-white);
+}
+
+.chevron-step.future {
+  background-color: var(--color-future);
+  color: var(--color-future-text);
+  border-left: 1px solid var(--border-color);
+}
+
+.chevron-step-text {
+  z-index: 2;
+  white-space: nowrap;
+}
+
+/* Guidance for Success Box (Screenshot 3 details) */
+.guidance-container {
+  background-color: #f3f2f1;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.guidance-title {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.guidance-content {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--text-main);
+}
+
+.guidance-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  margin-top: 0.25rem;
+}
+
+.guidance-list-item {
+  position: relative;
+  padding-left: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.guidance-list-item::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--color-brand);
+}
+
+/* Clean Salesforce Light Cards */
+.panel-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-card);
+}
+
+/* Tab menu layout for workspace headers */
+.sf-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1rem;
+  gap: 1.5rem;
+}
+
+.sf-tab {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 0.4rem 0.1rem;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: var(--transition-fast);
+}
+
+.sf-tab.active {
+  color: var(--text-link);
+  border-bottom-color: var(--text-link);
+}
+
+/* Two Column Split */
+.workspace-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.input-pane-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Field edit layout (Overview section matching Screenshot 2) */
+.overview-fields-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.overview-fields-title {
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.fields-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1.5rem;
+}
+
+.field-cell {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f3f2f1;
+  padding: 0.4rem 0;
+}
+
+.field-cell:hover {
+  background-color: #fafaf9;
+}
+
+.field-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  width: 40%;
+}
+
+.field-value-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 60%;
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.field-value {
+  font-size: 0.8rem;
+  color: var(--text-main);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.field-value.link {
+  color: var(--text-link);
+  cursor: pointer;
+}
+
+.field-value.link:hover {
+  text-decoration: underline;
+}
+
+.field-edit-icon {
+  color: #aeaeae;
+  font-size: 0.75rem;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.field-cell:hover .field-edit-icon {
+  opacity: 1;
+}
+
+/* Rep Notes Area styling */
+.notes-editor-wrapper {
+  width: 100%;
+}
+
+.notes-editor {
+  width: 100%;
+  height: 180px;
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 0.75rem;
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  outline: none;
+  resize: none;
+}
+
+.notes-editor:focus {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 3px rgba(1, 118, 211, 0.25);
+}
+
+.editor-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.btn-mic {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background-color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: var(--transition-fast);
+}
+
+.btn-mic:hover {
+  background-color: #f3f2f1;
+}
+
+.btn-mic.recording {
+  background-color: var(--color-danger);
+  color: #ffffff;
+  animation: micPulse 1.5s infinite ease-in-out;
+}
+
+.speech-status {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* History log styling (Screenshot 4) */
+.history-notes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.highlights-log-box {
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 0.75rem;
+}
+
+.highlight-entry {
+  border-bottom: 1px solid #f3f2f1;
+  padding: 0.5rem 0;
+}
+
+.highlight-entry:last-child {
+  border-bottom: none;
+}
+
+.highlight-entry-date {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: var(--text-link);
+  margin-bottom: 0.15rem;
+}
+
+.highlight-entry-text {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--text-main);
+}
+
+/* Right column panels (AI Coach) */
+.coach-pane-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.results-empty {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 380px;
+  text-align: center;
+  color: var(--text-muted);
+  border: 1px dashed var(--border-color);
+  background-color: #ffffff;
+  border-radius: var(--border-radius);
+}
+
+.results-empty-icon {
+  width: 42px;
+  height: 42px;
+  margin-bottom: 0.75rem;
+  opacity: 0.3;
+  color: var(--color-brand);
+}
+
+.results-empty h3 {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.results-empty p {
+  font-size: 0.8rem;
+  max-width: 260px;
+}
+
+/* Coach Output Panel */
+.diagnosis-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.diagnosis-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.diagnosis-header h3 {
+  font-size: 1.05rem;
+  font-weight: bold;
+}
+
+.confidence-badge {
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  border: 1px solid;
+}
+
+.confidence-badge.high {
+  background-color: #e6f4ea;
+  color: #137333;
+  border-color: #ceead6;
+}
+
+.confidence-badge.medium {
+  background-color: #fef7e0;
+  color: #b06000;
+  border-color: #feebc8;
+}
+
+.confidence-badge.low {
+  background-color: #fce8e6;
+  color: #c5221f;
+  border-color: #fad2cf;
+}
+
+.badge-is-mock {
+  font-size: 0.65rem;
+  background-color: #e8f0fe;
+  color: var(--text-link);
+  border: 1px dashed var(--text-link);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.coach-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.reasoning-container h4 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.reasoning-text {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-main);
+  border-left: 3px solid var(--color-brand);
+  padding-left: 0.65rem;
+}
+
+.list-block h4 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.list-block ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.list-block li {
+  font-size: 0.8rem;
+  padding-left: 0.75rem;
+  position: relative;
+  color: var(--text-main);
+  line-height: 1.35;
+}
+
+.list-block li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--color-brand);
+}
+
+.list-block.missing li::before {
+  color: #d85c00;
+}
+
+.risk-tag {
+  background-color: #fdf2f2;
+  border: 1px solid #fde8e8;
+  color: #c5221f;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  display: inline-block;
+  margin-right: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Framework checklist cards */
+.framework-card h3 {
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.framework-badge-pill {
+  font-size: 0.65rem;
+  background-color: #f3f2f1;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+}
+
+.framework-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.framework-item {
+  border: 1px solid var(--border-color);
+  background-color: #ffffff;
+  padding: 0.65rem;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.framework-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.framework-item-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.framework-status-badge {
+  font-size: 0.6rem;
+  font-weight: bold;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.framework-status-badge.confirmed {
+  background-color: #e6f4ea;
+  color: #137333;
+}
+
+.framework-status-badge.partial {
+  background-color: #fef7e0;
+  color: #b06000;
+}
+
+.framework-status-badge.missing {
+  background-color: #fce8e6;
+  color: #c5221f;
+}
+
+.framework-item-evidence {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+  font-style: italic;
+}
+
+/* User Override Loop Component */
+.override-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1rem;
+}
+
+.override-header h4 {
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.override-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.override-select {
+  flex-grow: 1;
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 0.4rem 1.75rem 0.4rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 0.7rem;
+}
+
+.override-input {
+  flex-grow: 2;
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  padding: 0.4rem;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  outline: none;
+}
+
+.override-input:focus {
+  border-color: var(--color-brand);
+}
+
+.override-logs {
+  background-color: #f3f2f1;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+
+.override-logs-title {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+  font-weight: bold;
+}
+
+.override-log-item {
+  font-size: 0.7rem;
+  color: var(--text-main);
+  padding: 0.15rem 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.override-log-item:last-child {
+  border-bottom: none;
+}
+
+.override-log-meta {
+  color: var(--color-brand);
+  font-weight: bold;
+}
+
+/* Sidebar Settings Drawer Drawer UI */
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition-fast);
+}
+
+.drawer-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.settings-drawer {
+  position: fixed;
+  top: 0;
+  right: -420px;
+  width: 420px;
+  height: 100vh;
+  background-color: #ffffff;
+  border-left: 1px solid var(--border-color);
+  z-index: 1000;
+  box-shadow: -4px 0 15px rgba(0,0,0,0.15);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  transition: right 0.25s ease-in-out;
+  overflow-y: auto;
+}
+
+.settings-drawer.open {
+  right: 0;
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.75rem;
+}
+
+.drawer-header h3 {
+  font-size: 1.2rem;
+  color: var(--text-main);
+}
+
+.btn-drawer-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-group label {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-control-input {
+  width: 100%;
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.5rem;
+  color: var(--text-main);
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.form-control-input:focus {
+  border-color: var(--color-brand);
+}
+
+.stages-config-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.stage-config-item {
+  background-color: #f3f2f1;
+  border: 1px solid var(--border-color);
+  padding: 0.75rem;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stage-config-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stage-number {
+  font-size: 0.7rem;
+  color: var(--color-brand);
+  font-weight: bold;
+}
+
+.btn-save-settings {
+  background-color: var(--color-brand);
+  color: #ffffff;
+  border: none;
+  padding: 0.65rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+.btn-save-settings:hover {
+  background-color: #015ba2;
+}
+
+/* Animations */
+@keyframes micPulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 0, 30, 0.4); }
+  70% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(234, 0, 30, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 0, 30, 0); }
+}
