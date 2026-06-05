@@ -884,7 +884,6 @@ export default function Home() {
                 <div className={`sf-tab ${activeTab === 'Related' ? 'active' : ''}`} onClick={() => setActiveTab('Related')}>Related</div>
                 <div className={`sf-tab ${activeTab === 'Products' ? 'active' : ''}`} onClick={() => setActiveTab('Products')}>Products</div>
                 <div className={`sf-tab ${activeTab === 'Contacts' ? 'active' : ''}`} onClick={() => setActiveTab('Contacts')}>Contacts</div>
-                <div className={`sf-tab ${activeTab === 'Hubspot' ? 'active' : ''}`} onClick={() => setActiveTab('Hubspot')}>Hubspot</div>
               </div>
 
               {activeTab === 'Details' && (
