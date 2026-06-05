@@ -327,6 +327,13 @@ I've integrated this context into our chat. You can now ask me to:
     setChatHistory(updatedHistory);
     setIsChatting(true);
 
+    // Compile all notes context including current unsaved notes
+    const activeHighlights = oppMetadata?.nextSteps?.highlights || [];
+    const unsavedParsed = parseNotesIntoDatedLogs(notes);
+    const combinedNotesContext = [...unsavedParsed, ...activeHighlights]
+      .map(entry => `${entry.date}: ${entry.text}`)
+      .join('\n\n');
+
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -335,7 +342,7 @@ I've integrated this context into our chat. You can now ask me to:
           messages: updatedHistory.map(m => ({ role: m.role, text: m.text })),
           opportunityContext: {
             crmContext: oppMetadata,
-            meetingNotes: notes,
+            meetingNotes: combinedNotesContext,
             frameworkType: activeTenant?.activeFramework
           },
           companyIntel: companyIntel,
@@ -362,10 +369,38 @@ I've integrated this context into our chat. You can now ask me to:
 
   // API Client call
   const analyzeNotes = async () => {
-    if (!notes.trim() || !activeTenant) return;
+    const currentInput = notes.trim();
+    const existingHighlights = oppMetadata?.nextSteps?.highlights || [];
+    
+    if (!currentInput && existingHighlights.length === 0) return;
+    
     setIsLoading(true);
     setApiError(null);
     setAnalysisResult(null);
+
+    // 1. Process current input notes into dated logs and prepends to history list
+    let updatedHighlights = [...existingHighlights];
+    if (currentInput) {
+      const parsedLogs = parseNotesIntoDatedLogs(currentInput);
+      updatedHighlights = [...parsedLogs, ...existingHighlights];
+      
+      // Update metadata state
+      setOppMetadata(prev => ({
+        ...prev,
+        nextSteps: {
+          ...prev.nextSteps,
+          highlights: updatedHighlights
+        }
+      }));
+      
+      // Clear current textarea input
+      setNotes('');
+    }
+
+    // 2. Compile all available notes context (the active history log) to send to AI
+    const combinedNotesContext = updatedHighlights
+      .map(entry => `${entry.date}: ${entry.text}`)
+      .join('\n\n');
 
     try {
       const response = await fetch('/api/classify', {
@@ -375,7 +410,7 @@ I've integrated this context into our chat. You can now ask me to:
           'x-api-key': apiKey.trim()
         },
         body: JSON.stringify({
-          meetingNotes: notes,
+          meetingNotes: combinedNotesContext,
           tenant: activeTenant,
           frameworkType: activeTenant.activeFramework,
           crmContext: oppMetadata // pass edited context fields!
@@ -1180,12 +1215,86 @@ I've integrated this context into our chat. You can now ask me to:
                 <button
                   onClick={analyzeNotes}
                   className="btn-sf btn-sf-primary"
-                  disabled={isLoading || !notes.trim()}
+                  disabled={isLoading || (!notes.trim() && (!oppMetadata?.nextSteps?.highlights || oppMetadata.nextSteps.highlights.length === 0))}
                   style={{ padding: '0.5rem 1.25rem' }}
                 >
                   {isLoading ? 'Running interpretation...' : 'Analyze Rep Notes ⚡'}
                 </button>
               </div>
+
+              {/* Logged Notes Log */}
+              {oppMetadata?.nextSteps?.highlights && oppMetadata.nextSteps.highlights.length > 0 && (
+                <div className="logged-notes-history">
+                  <div className="logged-notes-history-header">
+                    <h4>📋 Logged Notes History ({oppMetadata.nextSteps.highlights.length})</h4>
+                    <button 
+                      type="button" 
+                      className="btn-sf btn-add-note"
+                      onClick={() => {
+                        const today = new Date();
+                        const todayDateStr = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`;
+                        setOppMetadata(prev => {
+                          const newHighlights = [{ date: todayDateStr, text: "New meeting note entry..." }, ...(prev?.nextSteps?.highlights || [])];
+                          return {
+                            ...prev,
+                            nextSteps: {
+                              ...prev?.nextSteps,
+                              highlights: newHighlights
+                            }
+                          };
+                        });
+                      }}
+                    >
+                      + Log New Note
+                    </button>
+                  </div>
+                  <div className="logged-notes-list">
+                    {oppMetadata.nextSteps.highlights.map((entry, idx) => (
+                      <div key={idx} className="logged-note-card">
+                        <div className="logged-note-card-header">
+                          <input 
+                            type="text" 
+                            className="logged-note-date-input"
+                            value={entry.date} 
+                            onChange={(e) => {
+                              const dateVal = e.target.value;
+                              setOppMetadata(prev => {
+                                const newHighlights = [...(prev?.nextSteps?.highlights || [])];
+                                newHighlights[idx] = { ...newHighlights[idx], date: dateVal };
+                                return { ...prev, nextSteps: { ...prev?.nextSteps, highlights: newHighlights } };
+                              });
+                            }}
+                          />
+                          <button 
+                            type="button" 
+                            className="btn-delete-note"
+                            onClick={() => {
+                              setOppMetadata(prev => {
+                                const newHighlights = (prev?.nextSteps?.highlights || []).filter((_, i) => i !== idx);
+                                return { ...prev, nextSteps: { ...prev?.nextSteps, highlights: newHighlights } };
+                              });
+                            }}
+                          >
+                            ✕ Delete
+                          </button>
+                        </div>
+                        <textarea
+                          className="logged-note-text-textarea"
+                          value={entry.text}
+                          onChange={(e) => {
+                            const textVal = e.target.value;
+                            setOppMetadata(prev => {
+                              const newHighlights = [...(prev?.nextSteps?.highlights || [])];
+                              newHighlights[idx] = { ...newHighlights[idx], text: textVal };
+                              return { ...prev, nextSteps: { ...prev?.nextSteps, highlights: newHighlights } };
+                            });
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </section>
 
             {/* LWC 2: AI Coach Dashboard results */}
@@ -1800,4 +1909,62 @@ const parseBoldText = (text) => {
   
   return result;
 };
+
+// Parse raw notes into separate dated entries. Undated lines automatically group under today's date.
+const parseNotesIntoDatedLogs = (text) => {
+  if (!text || !text.trim()) return [];
+  
+  // Matches dates like:
+  // - 6/4/2026, 06.05.2026, 10-7-2027
+  // - June 3, 2026, Jan 15, 2026
+  const dateRegex = /^(?:[\s\-\*]*)(?:\b(\d{1,2})[/\.-](\d{1,2})[/\.-](\d{2,4})\b|\b(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})\b)/i;
+  
+  const lines = text.split('\n');
+  const results = [];
+  let currentEntry = null;
+  
+  const today = new Date();
+  const todayDateStr = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`;
+  
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    if (!trimmedLine) continue;
+    
+    const match = line.match(dateRegex);
+    if (match) {
+      if (currentEntry) {
+        results.push(currentEntry);
+      }
+      
+      let dateStr = "";
+      if (match[1]) {
+        dateStr = `${match[1]}/${match[2]}/${match[3]}`;
+      } else {
+        dateStr = `${match[4]} ${match[5]}, ${match[6]}`;
+      }
+      
+      const textContent = line.replace(dateRegex, '').replace(/^[\s:\-\*]+/, '').trim();
+      currentEntry = {
+        date: dateStr,
+        text: textContent
+      };
+    } else {
+      if (currentEntry) {
+        currentEntry.text += '\n' + trimmedLine;
+      } else {
+        currentEntry = {
+          date: todayDateStr,
+          text: trimmedLine
+        };
+      }
+    }
+  }
+  
+  if (currentEntry) {
+    results.push(currentEntry);
+  }
+  
+  return results;
+};
+
 
