@@ -851,7 +851,7 @@ export default function Home() {
           <div className="coach-pane-group">
             
             {/* LWC 1: Scoping Assist (Notes input editor) */}
-            <section className="panel-card" style={{ borderTop: '4px solid var(--color-brand)' }}>
+            <section className="panel-card panel-card-ai" style={{ borderTop: '4px solid var(--color-brand)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                 <h3 style={{ fontSize: '0.95rem', fontWeight: 'bold', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
                   🤖 Stagecraft AI Scoping Assist
@@ -878,10 +878,10 @@ export default function Home() {
               <div className="editor-toolbar">
                 <div className="speech-control">
                   <button 
-                    type="button" 
-                    className={`btn-mic ${isRecording ? 'recording' : ''}`}
-                    onClick={toggleRecording}
-                    title="Dictate meeting summary"
+                     type="button" 
+                     className={`btn-mic ${isRecording ? 'recording' : ''}`}
+                     onClick={toggleRecording}
+                     title="Dictate meeting summary"
                   >
                     🎙️
                   </button>
@@ -901,7 +901,7 @@ export default function Home() {
             </section>
 
             {/* LWC 2: AI Coach Dashboard results */}
-            <section className="panel-card" style={{ borderTop: '4px solid #a855f7', minHeight: '380px' }}>
+            <section className="panel-card panel-card-ai" style={{ borderTop: '4px solid var(--color-brand)', minHeight: '380px' }}>
               
               {!isLoading && !analysisResult && !apiError && (
                 <div className="results-empty" style={{ height: '320px' }}>
@@ -961,6 +961,19 @@ export default function Home() {
                       <h4>AI Scaffolding Reasoning</h4>
                       <p className="reasoning-text">{analysisResult.reasoning}</p>
                     </div>
+
+                    {analysisResult.coaching_feedback && analysisResult.coaching_feedback.length > 0 && (
+                      <div className="coaching-feedback-container" style={{ padding: '0.85rem', backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '6px' }}>
+                        <h4 style={{ color: '#1e40af', fontSize: '0.85rem', fontWeight: 'bold', margin: '0 0 0.5rem 0', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          💡 Sales Coach Action Plan
+                        </h4>
+                        <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.8rem', color: '#1e3a8a', lineHeight: '1.5' }}>
+                          {analysisResult.coaching_feedback.map((tip, idx) => (
+                            <li key={idx} style={{ marginBottom: '0.4rem' }}>{tip}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginTop: '0.25rem' }}>
                       <div className="list-block">

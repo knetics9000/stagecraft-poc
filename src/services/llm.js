@@ -89,6 +89,7 @@ Instructions:
 6. Extract a list of "signals_found" (explicit positive markers) and "missing_or_ambiguous" data gaps.
 7. Provide a single "recommended_next_action" that target-addresses the most critical framework gap (e.g. if Champion is missing, action should focus on finding one).
 8. Flag deal risks in "risk_flags" (e.g., single-threaded, timeline slippage, redline delays, database discrepancies).
+9. Provide an array of "coaching_feedback" containing 2-3 specific, actionable points of advice on how the representative can get more information from the decision maker, resolve active gaps, and advance the deal to the next stage.
 
 ${frameworkSchemaNotes}
 
@@ -102,6 +103,10 @@ You must return a JSON object that adheres strictly to the following JSON schema
   "missing_or_ambiguous": ["Missing 1", "Missing 2"],
   "recommended_next_action": "Actionable next step",
   "risk_flags": ["Risk Flag 1"],
+  "coaching_feedback": [
+    "Specific actionable tip on how the rep should get more info from the decision maker or address gaps",
+    "Specific tip on how to move this deal along the pipeline process"
+  ],
   "framework_criteria": [
     {
       "key": "framework_key", // e.g. "champion", "budget", "situation"
@@ -130,6 +135,7 @@ export async function callGemini(apiKey, systemPrompt, meetingNotes) {
       missing_or_ambiguous: { type: "ARRAY", items: { type: "STRING" } },
       recommended_next_action: { type: "STRING" },
       risk_flags: { type: "ARRAY", items: { type: "STRING" } },
+      coaching_feedback: { type: "ARRAY", items: { type: "STRING" } },
       framework_criteria: {
         type: "ARRAY",
         items: {
@@ -153,6 +159,7 @@ export async function callGemini(apiKey, systemPrompt, meetingNotes) {
       "missing_or_ambiguous",
       "recommended_next_action",
       "risk_flags",
+      "coaching_feedback",
       "framework_criteria"
     ]
   };
@@ -205,6 +212,7 @@ export function getMockAnalysis(tenant, frameworkType, notes, crmContext = {}) {
   let riskFlags = [];
   let nextAction = "";
   let frameworkCriteria = [];
+  let coachingFeedback = [];
 
   // Determine stage based on notes keywords
   let notesDeducedStage = tenant.stages[0].name;
@@ -251,30 +259,50 @@ export function getMockAnalysis(tenant, frameworkType, notes, crmContext = {}) {
       gaps = ["Post-mortem review not scheduled"];
       riskFlags = ["Opportunity Lost"];
       nextAction = "Schedule a post-mortem call to gather feedback.";
+      coachingFeedback = [
+        "Reach out to Dan for a low-pressure post-mortem call: 'Since you went with another option, I'd love to know what criteria we missed so we can improve.'",
+        "Keep Dan on a bi-monthly relationship cadence to check if the chosen vendor runs into onboarding friction."
+      ];
     } else if (text.includes('won') || text.includes('closed won') || text.includes('booking') || text.includes('signed')) {
       reasoning = `The deal has been successfully Closed Won. The contract is signed, and the client onboarding handoff is underway.`;
       signals = ["Contract signed", "Buyer approved subscription/deal"];
       gaps = [];
       riskFlags = [];
       nextAction = "Complete onboarding sequence and transition account to Customer Success.";
+      coachingFeedback = [
+        "Coordinate a hand-off sync with the Customer Success Specialist to review CAU's specific usage goals.",
+        "Message Dr. Terrence Martin confirming activation and thanking him for his partnership."
+      ];
     } else if (text.includes('redline') || text.includes('legal') || text.includes('valdoshia')) {
       reasoning = `The deal is currently in ${matchingStage} due to active IP ownership redlines. While we have a strong Academic Champion (Director), we are single-threaded on the legal clearance path.`;
       signals = ["Champion validated in R&D team", "NDA signed and initial testing complete"];
       gaps = ["No response from Business Champion regarding legal escalations", "Economic buyer has not intervened"];
       riskFlags = ["Legal redline friction", "Single-threaded contact"];
       nextAction = "Request an executive alignment call with the Champion to resolve indemnification disputes.";
+      coachingFeedback = [
+        "Ask your champion Terrence: 'Could you introduce us to Valdoshia Hunt directly so we can run a 15-minute legal-to-legal review and resolve the IP redlines together?'",
+        "Send the standard CAU legal compromise addendum from our library to Valdoshia as a starting point to clear the exit gate."
+      ];
     } else if (hasChampion && hasEB && hasMetrics) {
       reasoning = `Validation successful and the Champion is preparing to present to the Economic Buyer. Deal is positioned in ${matchingStage} pending budget sign-off.`;
       signals = ["Budget parameters confirmed", "Champion is presenting validation results internally"];
       gaps = ["IT security review pending", "Direct engagement with Economic Buyer"];
       riskFlags = ["No direct access to budget owner"];
       nextAction = "Send the security/compliance documentation packet today to clear the IT security gate.";
+      coachingFeedback = [
+        "Prompt the champion David Moore: 'To help support the Provost's monthly meeting review, would it be helpful to share our standard 1-page executive summary on the physics and engineering usage statistics?'",
+        "Ask David: 'What specific library budget concerns or ROI metrics does the Provost typically focus on when reviewing software upgrades?'"
+      ];
     } else {
       reasoning = `Initial scoping completed. Client is facing high-urgency bottlenecks, suggesting alignment on pain. Deal resides in ${matchingStage} while we draft the NDA.`;
       signals = ["Access bottleneck is top priority", "Champion agreed to evaluate a data trial"];
       gaps = ["No budget details shared yet", "No formal contract drafted"];
       riskFlags = ["Early-stage discovery"];
       nextAction = "Deliver the standard NDA template today and confirm the follow-up meeting date.";
+      coachingFeedback = [
+        "Ask Laura Slavin: 'Beyond Will Waldron, who else in the science or nursing faculty needs to advocate to the library to support this subscription?'",
+        "Ensure we secure faculty trial requests today so we can present concrete usage demand data during proposal drafting."
+      ];
     }
 
   } else if (frameworkType === 'bant') {
@@ -299,24 +327,40 @@ export function getMockAnalysis(tenant, frameworkType, notes, crmContext = {}) {
       gaps = ["Reason for loss documentation pending"];
       riskFlags = ["Lead Lost"];
       nextAction = "Update account status to Lost and set up nurture follow-up in CRM.";
+      coachingFeedback = [
+        "Log a detailed description of why the budget cycle or clinical need was missed in the CRM archives.",
+        "Add Dr. Marcus to the hospital tech newsletter cadence to nurture relationship value for next year's planning."
+      ];
     } else if (text.includes('won') || text.includes('closed won') || text.includes('booking') || text.includes('signed')) {
       reasoning = `Deal closed and won. Software licenses and terms are finalized and signed.`;
       signals = ["Signed contract", "Budget approved"];
       gaps = [];
       riskFlags = [];
       nextAction = "Configure customer software workspace and send login credentials.";
+      coachingFeedback = [
+        "Verify setup of clinic logins for the cardiology team.",
+        "Schedule the 30-day post-launch check-in with cardiology operations."
+      ];
     } else if (confirmedCount >= 3) {
       reasoning = `A clear budget has been confirmed ($30K) and the Chief of Cardiology (Authority) has requested a demo. This deal is solidifying in ${matchingStage}.`;
       signals = ["Budget confirmed up to $30K", "Chief actively engaged"];
       gaps = ["Security review not yet started", "Procurement process unmapped"];
       riskFlags = ["Procurement department gatekeepers"];
       nextAction = "Schedule the live product demo with the operations team.";
+      coachingFeedback = [
+        "Ask Dr. Marcus: 'Can we schedule a short sync with the clinical operations manager to walk through the security compliance checklist during the demo?'",
+        "Obtain hospital procurement's IT questionnaire early to avoid delays in final contract routing."
+      ];
     } else {
       reasoning = `Early discovery call. Some pain was identified regarding missed appointments, but budget and timeline remain unconfirmed.`;
       signals = ["Clinician expressed interest in scheduling optimization"];
       gaps = ["Budget scope unconfirmed", "Timeline undefined"];
       riskFlags = ["Early lead qualification"];
       nextAction = "Engage department head in discovery call to confirm budget cycles.";
+      coachingFeedback = [
+        "Ask the clinical team: 'How are scheduling software purchases usually funded—is there a central IT fund, or does it come from cardiology's specific clinical budget?'",
+        "Confirm who handles final HIPAA software sign-offs at Valley Health so we can engage them on the next call."
+      ];
     }
   } else {
     // SPIN
@@ -341,24 +385,40 @@ export function getMockAnalysis(tenant, frameworkType, notes, crmContext = {}) {
       gaps = ["Competitor selection feedback missing"];
       riskFlags = ["Opportunity Lost"];
       nextAction = "Perform internal audit of lost deal objections.";
+      coachingFeedback = [
+        "Ask Thomas: 'What alternative counsel strategy did your board decide on to manage the competitor patent threat?'",
+        "Keep Apex Labs on a quarterly monitoring list to trace if their Series A funding is affected by patent disputes."
+      ];
     } else if (text.includes('won') || text.includes('closed won') || text.includes('booking') || text.includes('signed')) {
       reasoning = `Engagement retainer successfully completed and signed by both parties.`;
       signals = ["Retainer paid", "Conflicts cleared"];
       gaps = [];
       riskFlags = [];
       nextAction = "Open case files and schedule initial strategy session.";
+      coachingFeedback = [
+        "Distribute the signed engagement letter to the partner lead.",
+        "Confirm calendar invites are sent to Apex Labs for the initial defense planning session next Tuesday."
+      ];
     } else if (hasI && hasN) {
       reasoning = `High-implied risk (funding round failure) has driven urgent buyer need. Deal is positioned in ${matchingStage} pending conflicts check.`;
       signals = ["Thomas stated cost is irrelevant to risk", "Urgent timeline"];
       gaps = ["Conflict check clearing pending", "Signed retainer agreement"];
       riskFlags = ["Extremely tight timeline", "Active competitor threat"];
       nextAction = "Run internal legal conflict checks immediately and deliver the engagement letter.";
+      coachingFeedback = [
+        "Ask Thomas: 'To help expedite clearing internal conflicts, could you share the full list of your cap table investors and competitors?'",
+        "Deliver the retainer wire transfer instructions directly to Thomas's finance head today to clear funding hurdles."
+      ];
     } else {
       reasoning = `Initial legal consultation completed. Client situation is documented but implication and value payoffs have not been deep-dived.`;
       signals = ["Thomas outlined business structure"];
       gaps = ["Implication of lawsuit unmapped", "Price sensitivity unknown"];
       riskFlags = ["Low urgency scoping"];
       nextAction = "Prompt Thomas to discuss potential funding impact of unresolved IP disputes.";
+      coachingFeedback = [
+        "Ask Thomas: 'If a competitor patent lawsuit is filed during your Series A due diligence period, how would that impact your lead investor's valuation or commitment?'",
+        "Pivot from situation mapping to implication discussions, building clear urgency around securing a defensive freedom-to-operate opinion."
+      ];
     }
   }
 
@@ -419,6 +479,7 @@ export function getMockAnalysis(tenant, frameworkType, notes, crmContext = {}) {
     missing_or_ambiguous: gaps,
     recommended_next_action: nextAction,
     risk_flags: riskFlags,
+    coaching_feedback: coachingFeedback,
     framework_criteria: frameworkCriteria
   };
 }
