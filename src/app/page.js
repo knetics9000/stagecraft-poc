@@ -53,11 +53,21 @@ export default function Home() {
   const [analysisResult, setAnalysisResult] = useState(null);
   const [apiError, setApiError] = useState(null);
   const [activeTab, setActiveTab] = useState('Details');
+
+  // AI Chat & Scraper States
+  const [aiActiveTab, setAiActiveTab] = useState('Playbook');
+  const [companyUrl, setCompanyUrl] = useState('');
+  const [companyIntel, setCompanyIntel] = useState(null);
+  const [isScraping, setIsScraping] = useState(false);
+  const [chatHistory, setChatHistory] = useState([]);
+  const [chatInput, setChatInput] = useState('');
+  const [isChatting, setIsChatting] = useState(false);
   
   // Speech recognition states
   const [isRecording, setIsRecording] = useState(false);
   const [speechError, setSpeechError] = useState('');
   const recognitionRef = useRef(null);
+  const chatFeedRef = useRef(null);
 
   // User manual override states
   const [overrideStage, setOverrideStage] = useState('');
@@ -143,8 +153,45 @@ export default function Home() {
       // Clean analysis when switching notes templates
       setAnalysisResult(null);
       setApiError(null);
+
+      // Initialize default company URL for scraper
+      let defaultUrl = 'https://www.example.com';
+      if (selectedTenantId === 'jove-academic') {
+        defaultUrl = selectedSampleIdx === '0' ? 'https://www.uah.edu' : 'https://www.cau.edu';
+      } else if (selectedTenantId === 'healthcare-sales') {
+        defaultUrl = 'https://www.valleyhealthlink.com';
+      } else if (selectedTenantId === 'legal-services') {
+        defaultUrl = 'https://www.apexlabs.com';
+      }
+      setCompanyUrl(defaultUrl);
+      setCompanyIntel(null);
+      setAiActiveTab('Playbook'); // Reset tab to playbook
+
+      // Initialize chat coach greeting
+      const companyName = initialMeta?.accountName || 'the client';
+      setChatHistory([
+        {
+          role: 'model',
+          text: `### 🤖 AI Sales Coach Activated
+
+Hi! I am your sales coach, **Sales Brain**. I've analyzed your meeting notes and current CRM parameters for **${companyName}**. 
+
+**Here is what you can ask me to do:**
+* ✉️ *"Draft a follow-up email to the champion"*
+* 💡 *"Suggest discovery questions to qualify their business pain"*
+* 📈 *"What are my biggest risks on this close date?"*
+* 🏢 **Company Intelligence Scraper:** Click **Scrape Website** in the panel below to crawl their public site and feed their executive goals directly into our chat context!`
+        }
+      ]);
     }
   }, [selectedTenantId, selectedSampleIdx, activeTenant]);
+
+  // Scroll chat feed to bottom when history or chatting state changes
+  useEffect(() => {
+    if (chatFeedRef.current) {
+      chatFeedRef.current.scrollTop = chatFeedRef.current.scrollHeight;
+    }
+  }, [chatHistory, isChatting]);
 
   // Handle template notes loading
   const handleSampleNotesChange = (e) => {
@@ -220,6 +267,96 @@ export default function Home() {
         console.error(err);
         setSpeechError('Could not start microphone.');
       }
+    }
+  };
+
+  // Scrape Company Website Intelligence
+  const triggerScrape = async () => {
+    if (!companyUrl.trim()) return;
+    setIsScraping(true);
+    try {
+      const response = await fetch('/api/scrape', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: companyUrl.trim(),
+          apiKey: apiKey.trim()
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to crawl website');
+      }
+      setCompanyIntel(data);
+      // Automatically add a helpful message from AI about the scraped intel
+      const introMessage = `### 🏢 Company Intelligence Scraped Successfully!
+
+I crawled **${data.name}** (${data.industry}) and extracted the following facts:
+* **Overview:** ${data.overview}
+* **Leadership & Structure:** ${data.key_facts ? data.key_facts.join('; ') : 'N/A'}
+* **Primary Offerings:** ${data.key_offerings ? data.key_offerings.join(', ') : 'N/A'}
+
+I've integrated this context into our chat. You can now ask me to:
+- *"Draft a follow-up email leveraging this research"*
+- *"Pitch our value proposition to their president"*`;
+
+      setChatHistory(prev => [
+        ...prev,
+        { role: 'model', text: introMessage }
+      ]);
+    } catch (err) {
+      console.error(err);
+      alert(`Scraper failed: ${err.message}`);
+    } finally {
+      setIsScraping(false);
+    }
+  };
+
+  // Chatbot send message
+  const sendChatMessage = async (e, customMessage = null) => {
+    if (e) e.preventDefault();
+    const messageText = customMessage || chatInput.trim();
+    if (!messageText || isChatting) return;
+
+    if (!customMessage) {
+      setChatInput('');
+    }
+    
+    // Add user message to history
+    const updatedHistory = [...chatHistory, { role: 'user', text: messageText }];
+    setChatHistory(updatedHistory);
+    setIsChatting(true);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: updatedHistory.map(m => ({ role: m.role, text: m.text })),
+          opportunityContext: {
+            crmContext: oppMetadata,
+            meetingNotes: notes,
+            frameworkType: activeTenant?.activeFramework
+          },
+          companyIntel: companyIntel,
+          apiKey: apiKey.trim()
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to generate chat reply');
+      }
+
+      setChatHistory(prev => [...prev, { role: 'model', text: data.text }]);
+    } catch (err) {
+      console.error(err);
+      setChatHistory(prev => [
+        ...prev,
+        { role: 'model', text: `⚠️ **Error:** Failed to connect to Sales Coach. ${err.message}` }
+      ]);
+    } finally {
+      setIsChatting(false);
     }
   };
 
@@ -1105,8 +1242,28 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Coach Results layout */}
-                  <div className="coach-grid">
+                  {/* AI Tabs */}
+                  <div className="ai-tabs">
+                    <button 
+                      className={`ai-tab-btn ${aiActiveTab === 'Playbook' ? 'active' : ''}`}
+                      onClick={() => setAiActiveTab('Playbook')}
+                      type="button"
+                    >
+                      📋 Coaching Playbook
+                    </button>
+                    <button 
+                      className={`ai-tab-btn ${aiActiveTab === 'Chat' ? 'active' : ''}`}
+                      onClick={() => setAiActiveTab('Chat')}
+                      type="button"
+                    >
+                      💬 AI Chat Coach
+                    </button>
+                  </div>
+
+                  {aiActiveTab === 'Playbook' ? (
+                    <>
+                      {/* Coach Results layout */}
+                      <div className="coach-grid">
                     
                     <div className="reasoning-container">
                       <h4>AI Scaffolding Reasoning</h4>
@@ -1302,7 +1459,152 @@ export default function Home() {
                       </div>
                     )}
                   </div>
+                    </>
+                  ) : (
+                    <div className="chat-interface-wrapper">
+                      
+                      {/* Scraper Card */}
+                      <div className="scraper-card">
+                        <div className="scraper-header">
+                          <span className="scraper-title-label">🏢 COMPANY INTELLIGENCE CRAWLER</span>
+                          <span className="scraper-desc">Crawls website to feed executive goals into chat context</span>
+                        </div>
+                        <div className="scraper-input-row">
+                          <input
+                            type="url"
+                            className="scraper-input"
+                            placeholder="Enter company website URL (e.g. https://www.cau.edu)..."
+                            value={companyUrl}
+                            onChange={(e) => setCompanyUrl(e.target.value)}
+                          />
+                          <button
+                            type="button"
+                            className="btn-sf btn-sf-primary btn-scrape"
+                            onClick={triggerScrape}
+                            disabled={isScraping}
+                          >
+                            {isScraping ? '⚡ Crawling...' : 'Scrape Website'}
+                          </button>
+                        </div>
+                        
+                        {companyIntel && (
+                          <div className="scraped-intel-drawer">
+                            <div className="scraped-intel-header">
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                <span className="scraped-intel-name">🔍 Profile: {companyIntel.name}</span>
+                                {companyIntel.isMock && (
+                                  <span className="scraped-intel-badge">Simulated</span>
+                                )}
+                              </div>
+                              <span className="scraped-intel-industry">{companyIntel.industry}</span>
+                            </div>
+                            <div className="scraped-intel-body">
+                              <p className="scraped-intel-overview">
+                                <strong>Overview:</strong> {companyIntel.overview}
+                              </p>
+                              {companyIntel.key_facts && companyIntel.key_facts.length > 0 && (
+                                <div className="scraped-intel-section">
+                                  <strong>Key Facts:</strong>
+                                  <ul>
+                                    {companyIntel.key_facts.map((fact, fIdx) => (
+                                      <li key={fIdx}>{fact}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              {companyIntel.key_offerings && companyIntel.key_offerings.length > 0 && (
+                                <div className="scraped-intel-section">
+                                  <strong>Primary Offerings:</strong>
+                                  <div className="intel-chips-row">
+                                    {companyIntel.key_offerings.map((offering, oIdx) => (
+                                      <span key={oIdx} className="intel-chip">{offering}</span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
 
+                      {/* Chat Messages Feed */}
+                      <div className="chat-feed-box" ref={chatFeedRef}>
+                        {chatHistory.map((msg, idx) => (
+                          <div key={idx} className={`chat-bubble-row ${msg.role}`}>
+                            <div className="chat-bubble">
+                              {msg.role === 'model' && (
+                                <div className="chat-bubble-avatar">🤖 Sales Brain</div>
+                              )}
+                              {msg.role === 'user' && (
+                                <div className="chat-bubble-avatar user">👤 Rep</div>
+                              )}
+                              <div className="chat-bubble-content">
+                                {formatMarkdown(msg.text)}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        {isChatting && (
+                          <div className="chat-bubble-row model">
+                            <div className="chat-bubble loading">
+                              <div className="chat-bubble-avatar">🤖 Sales Brain</div>
+                              <div className="chat-loading-dots">
+                                <span>.</span><span>.</span><span>.</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Suggestion Chips */}
+                      <div className="chat-suggestion-chips">
+                        <button
+                          type="button"
+                          className="chat-suggestion-chip"
+                          onClick={() => sendChatMessage(null, "Draft a follow-up email leveraging this research")}
+                          disabled={isChatting}
+                        >
+                          ✉️ Draft Email
+                        </button>
+                        <button
+                          type="button"
+                          className="chat-suggestion-chip"
+                          onClick={() => sendChatMessage(null, "Suggest discovery questions to qualify their business pain")}
+                          disabled={isChatting}
+                        >
+                          💡 Suggest Discovery Questions
+                        </button>
+                        <button
+                          type="button"
+                          className="chat-suggestion-chip"
+                          onClick={() => sendChatMessage(null, "Check pipeline risks and close date compatibility")}
+                          disabled={isChatting}
+                        >
+                          📈 Check Timeline Risks
+                        </button>
+                      </div>
+
+                      {/* Message Input form */}
+                      <form onSubmit={sendChatMessage} className="chat-input-row">
+                        <input
+                          type="text"
+                          className="chat-input"
+                          placeholder="Ask Sales Brain (e.g. 'Draft email' or 'Check risks')..."
+                          value={chatInput}
+                          onChange={(e) => setChatInput(e.target.value)}
+                          disabled={isChatting}
+                        />
+                        <button
+                          type="submit"
+                          className="btn-sf btn-sf-primary btn-chat-send"
+                          disabled={isChatting || !chatInput.trim()}
+                        >
+                          Send
+                        </button>
+                      </form>
+
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -1438,3 +1740,64 @@ export default function Home() {
     </div>
   );
 }
+
+// Markdown parsing helpers for chat coach bubbles
+const formatMarkdown = (text) => {
+  if (!text) return '';
+  const lines = text.split('\n');
+  return lines.map((line, idx) => {
+    let content = line;
+    if (content.startsWith('### ')) {
+      return <h4 key={idx} className="chat-h4">{content.replace('### ', '')}</h4>;
+    }
+    if (content.startsWith('## ')) {
+      return <h3 key={idx} className="chat-h3">{content.replace('## ', '')}</h3>;
+    }
+    if (content.startsWith('# ')) {
+      return <h2 key={idx} className="chat-h2">{content.replace('# ', '')}</h2>;
+    }
+    if (content.startsWith('* ') || content.startsWith('- ')) {
+      const parsedText = parseBoldText(content.substring(2));
+      return (
+        <ul key={idx} className="chat-ul">
+          <li className="chat-li">{parsedText}</li>
+        </ul>
+      );
+    }
+    if (content.trim() === '') {
+      return <div key={idx} className="chat-spacer" />;
+    }
+    return <p key={idx} className="chat-p">{parseBoldText(content)}</p>;
+  });
+};
+
+const parseBoldText = (text) => {
+  const parts = text.split(/\*\*(.*?)\*\//g); // Split by bold tags or asterisk groups
+  const boldRegex = /\*\*(.*?)\*\*/g;
+  
+  // Safe extraction matching typical bold blocks in Javascript
+  const matches = [...text.matchAll(boldRegex)];
+  if (matches.length === 0) return text;
+  
+  const result = [];
+  let lastIdx = 0;
+  matches.forEach((match, idx) => {
+    const matchStart = match.index;
+    const matchText = match[1];
+    
+    // Add prefix
+    if (matchStart > lastIdx) {
+      result.push(text.substring(lastIdx, matchStart));
+    }
+    // Add bold
+    result.push(<strong key={idx}>{matchText}</strong>);
+    lastIdx = matchStart + match[0].length;
+  });
+  
+  if (lastIdx < text.length) {
+    result.push(text.substring(lastIdx));
+  }
+  
+  return result;
+};
+
