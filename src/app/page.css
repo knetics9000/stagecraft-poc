@@ -481,6 +481,40 @@ body {
   gap: 0.75rem 1.5rem;
 }
 
+/* Tooltip Help Icon next to labels */
+.info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  background-color: var(--border-color);
+  color: var(--text-muted);
+  border-radius: 50%;
+  font-size: 0.55rem;
+  margin-left: 0.35rem;
+  cursor: help;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+  font-style: normal;
+  line-height: 1;
+}
+
+.info-icon:hover {
+  background-color: var(--color-brand);
+  color: var(--bg-page);
+}
+
+/* Empty placeholder hiding on mobile */
+@media (max-width: 768px) {
+  .fields-grid-2col {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  .field-cell.empty-placeholder {
+    display: none;
+  }
+}
+
 .field-cell {
   display: flex;
   justify-content: space-between;
@@ -1101,3 +1135,217 @@ body {
   70% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(234, 0, 30, 0); }
   100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 0, 30, 0); }
 }
+
+/* AI Sales Coach Action Playbook */
+.playbook-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.playbook-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.playbook-title {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-white);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.playbook-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.playbook-card:hover {
+  border-color: var(--color-brand);
+  box-shadow: var(--shadow-ambient-purple);
+}
+
+/* Priority Indicator left border */
+.playbook-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: var(--color-risk); /* default to gap / risk color */
+}
+
+/* Card top layout: Gap and badges */
+.playbook-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.playbook-gap-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.playbook-gap-label {
+  font-size: 0.65rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--color-risk);
+  letter-spacing: 0.05em;
+}
+
+.playbook-gap-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-white);
+}
+
+.playbook-badges {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.playbook-badge {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background-color: var(--bg-header);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.playbook-badge.contact {
+  border-color: rgba(210, 187, 255, 0.4);
+  color: var(--color-brand);
+}
+
+.playbook-badge.time {
+  border-color: rgba(255, 208, 125, 0.4);
+  color: var(--color-warning);
+}
+
+/* Playbook card grid details */
+.playbook-details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+  border-top: 1px solid var(--border-color);
+  padding-top: 0.85rem;
+}
+
+@media (min-width: 768px) {
+  .playbook-details-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.playbook-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.playbook-section.full-width {
+  grid-column: 1 / -1;
+}
+
+.playbook-section-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.playbook-section-content {
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--text-main);
+}
+
+/* Suggested questions styling */
+.playbook-questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+}
+
+.playbook-question-item {
+  background-color: var(--bg-header);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.75rem;
+  color: var(--text-main);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.playbook-question-item:hover {
+  background-color: rgba(210, 187, 255, 0.08);
+  border-color: var(--color-brand);
+}
+
+.playbook-question-text {
+  flex-grow: 1;
+  margin-right: 0.5rem;
+  font-style: italic;
+  line-height: 1.35;
+}
+
+.playbook-copy-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast);
+  padding: 0.1rem;
+}
+
+.playbook-question-item:hover .playbook-copy-btn {
+  color: var(--color-brand);
+}
+
+.playbook-copy-toast {
+  font-size: 0.65rem;
+  color: var(--color-success);
+  font-weight: bold;
+}
+

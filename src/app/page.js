@@ -3,6 +3,32 @@
 import { useState, useEffect, useRef } from 'react';
 import defaultTenants from '@/data/default_tenants.json';
 
+// Convert "M/D/YYYY" to "YYYY-MM-DD" for HTML5 Date Input
+const convertMDYToYMD = (dateStr) => {
+  if (!dateStr || dateStr === 'N/A') return '';
+  const parts = dateStr.split('/');
+  if (parts.length === 3) {
+    const month = parts[0].padStart(2, '0');
+    const day = parts[1].padStart(2, '0');
+    const year = parts[2];
+    return `${year}-${month}-${day}`;
+  }
+  return dateStr;
+};
+
+// Convert "YYYY-MM-DD" from HTML5 Date Input to "M/D/YYYY" for opportunity metadata
+const convertYMDToMDY = (dateStr) => {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    const year = parts[0];
+    const month = parseInt(parts[1], 10).toString();
+    const day = parseInt(parts[2], 10).toString();
+    return `${month}/${day}/${year}`;
+  }
+  return dateStr;
+};
+
 export default function Home() {
   // Config & State
   const [tenants, setTenants] = useState([]);
@@ -37,6 +63,34 @@ export default function Home() {
   const [overrideStage, setOverrideStage] = useState('');
   const [overrideReason, setOverrideReason] = useState('');
   const [overrideLogs, setOverrideLogs] = useState([]);
+
+  // Copy questions helper state
+  const [copiedQuestionKey, setCopiedQuestionKey] = useState(null);
+
+  const handleCopyQuestion = (text, key) => {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        setCopiedQuestionKey(key);
+        setTimeout(() => setCopiedQuestionKey(null), 1500);
+      }).catch(err => {
+        console.error('Failed to copy question: ', err);
+      });
+    } else {
+      // Fallback
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        setCopiedQuestionKey(key);
+        setTimeout(() => setCopiedQuestionKey(null), 1500);
+      } catch (err) {
+        console.error('Fallback copy failed: ', err);
+      }
+      document.body.removeChild(textArea);
+    }
+  };
 
   // Drawer configuration form states
   const [drawerTenantName, setDrawerTenantName] = useState('');
@@ -332,6 +386,10 @@ export default function Home() {
         probability: "20%",
         pushCount: "1",
         priceBook: "Price Book 3",
+        quoteDate: "",
+        quoteDelivered: "false",
+        decisionDate: "",
+        description: "Faculty from Physics and Engineering requesting upgrade to Unlimited catalog.",
         activityStats: {
           librarianMeetings: "4",
           trials6m: "25",
@@ -371,6 +429,10 @@ export default function Home() {
         probability: "15%",
         pushCount: "2",
         priceBook: "Price Book 3",
+        quoteDate: "3/25/2026",
+        quoteDelivered: "true",
+        decisionDate: "5/14/2026",
+        description: "Upgrade package proposal for JoVE Business and Core: A&P.",
         activityStats: {
           librarianMeetings: "20",
           trials6m: "0",
@@ -410,6 +472,10 @@ export default function Home() {
         probability: "35%",
         pushCount: "0",
         priceBook: "Price Book 1",
+        quoteDate: "",
+        quoteDelivered: "false",
+        decisionDate: "",
+        description: "Cardiac department scheduler scheduling integration.",
         activityStats: {
           librarianMeetings: "1",
           trials6m: "2",
@@ -447,6 +513,10 @@ export default function Home() {
         probability: "60%",
         pushCount: "0",
         priceBook: "Legal Services Tier A",
+        quoteDate: "5/26/2026",
+        quoteDelivered: "false",
+        decisionDate: "6/10/2026",
+        description: "Litigation retainer for competitor patent infringement.",
         activityStats: {
           librarianMeetings: "2",
           trials6m: "0",
@@ -483,6 +553,10 @@ export default function Home() {
       probability: "10%",
       pushCount: "0",
       priceBook: "Price Book 1",
+      quoteDate: "",
+      quoteDelivered: "false",
+      decisionDate: "",
+      description: "",
       activityStats: {
         librarianMeetings: "0",
         trials6m: "0",
@@ -520,13 +594,60 @@ export default function Home() {
     setEditingField(null);
   };
 
-  const renderEditableField = (label, key, isLink = false, isSelect = false, span2 = false) => {
+  const renderEditableField = (label, key, options = {}) => {
+    const {
+      isLink = false,
+      isSelect = false,
+      span2 = false,
+      inputType = 'text',
+      hasHelp = false,
+      helpText = ''
+    } = options;
+
     const isEditing = editingField === key;
     const value = oppMetadata ? oppMetadata[key] : '';
 
+    // If it's a checkbox, render immediately toggleable checked/unchecked input
+    if (inputType === 'checkbox') {
+      const isChecked = value === 'true' || value === true || value === 'Yes';
+      return (
+        <div className="field-cell" style={span2 ? { gridColumn: 'span 2' } : {}}>
+          <span className="field-label" style={span2 ? { width: '20%' } : { width: '40%' }}>
+            {label}
+            {hasHelp && (
+              <span className="info-icon" title={helpText}>
+                ⓘ
+              </span>
+            )}
+          </span>
+          <div className="field-value-group" style={{ justifyContent: 'flex-end', width: span2 ? '80%' : '60%' }}>
+            <input
+              type="checkbox"
+              checked={isChecked}
+              onChange={(e) => {
+                const newVal = e.target.checked ? 'true' : 'false';
+                setOppMetadata(prev => ({
+                  ...prev,
+                  [key]: newVal
+                }));
+              }}
+              style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
+            />
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="field-cell" style={span2 ? { gridColumn: 'span 2' } : {}}>
-        <span className="field-label" style={span2 ? { width: '20%' } : { width: '40%' }}>{label}</span>
+        <span className="field-label" style={span2 ? { width: '20%' } : { width: '40%' }}>
+          {label}
+          {hasHelp && (
+            <span className="info-icon" title={helpText}>
+              ⓘ
+            </span>
+          )}
+        </span>
         <div className="field-value-group" style={{ justifyContent: 'flex-end', width: span2 ? '80%' : '60%' }}>
           {isEditing ? (
             isSelect ? (
@@ -543,6 +664,26 @@ export default function Home() {
                   <option key={idx} value={s.name}>{s.name}</option>
                 ))}
               </select>
+            ) : inputType === 'date' ? (
+              <input
+                type="date"
+                value={convertMDYToYMD(editValue)}
+                onChange={(e) => setEditValue(convertYMDToMDY(e.target.value))}
+                onBlur={() => saveField(key)}
+                onKeyDown={(e) => e.key === 'Enter' && saveField(key)}
+                className="override-input"
+                style={{ width: '100%', padding: '0.2rem', fontSize: '0.85rem', border: '1px solid var(--border-color)', borderRadius: '4px', textAlign: 'right' }}
+                autoFocus
+              />
+            ) : inputType === 'textarea' ? (
+              <textarea
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                onBlur={() => saveField(key)}
+                className="override-input"
+                style={{ width: '100%', minHeight: '60px', padding: '0.3rem', fontSize: '0.8rem', border: '1px solid var(--border-color)', borderRadius: '4px', textAlign: 'left', fontFamily: 'inherit', color: 'var(--text-main)' }}
+                autoFocus
+              />
             ) : (
               <input
                 type="text"
@@ -557,14 +698,20 @@ export default function Home() {
             )
           ) : (
             <>
-              <span 
+              <span
                 className={`field-value ${isLink ? 'link' : ''}`}
-                style={{ fontWeight: key === 'amount' || key === 'stage' ? 'bold' : 'normal' }}
+                style={{
+                  fontWeight: key === 'amount' || key === 'stage' ? 'bold' : 'normal',
+                  textAlign: inputType === 'textarea' ? 'left' : 'right',
+                  width: inputType === 'textarea' ? '100%' : 'auto',
+                  whiteSpace: inputType === 'textarea' ? 'pre-wrap' : 'nowrap',
+                  cursor: 'pointer'
+                }}
                 onClick={() => startEditing(key, value)}
               >
-                {value}
+                {inputType === 'textarea' ? (value || <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Double-click to add description</span>) : value}
               </span>
-              <span 
+              <span
                 className="field-edit-icon"
                 onClick={() => startEditing(key, value)}
               >
@@ -751,16 +898,21 @@ export default function Home() {
                     </div>
                     <div className="fields-grid-2col" style={{ borderTop: '1px solid #e5e5e5', paddingTop: '0.5rem', marginTop: '0.25rem' }}>
                       {renderEditableField("Opportunity Name", "opportunityName")}
-                      {renderEditableField("Close Date", "closeDate")}
-                      {renderEditableField("Account Name", "accountName", true)}
-                      {renderEditableField("Stage", "stage", false, true)}
+                      {renderEditableField("Close Date", "closeDate", { inputType: 'date' })}
+                      {renderEditableField("Account Name", "accountName", { isLink: true })}
+                      {renderEditableField("Stage", "stage", { isSelect: true })}
                       {renderEditableField("Type", "type")}
                       {renderEditableField("Probability (%)", "probability")}
                       {renderEditableField("Amount", "amount")}
                       {renderEditableField("PushCount", "pushCount")}
                       {renderEditableField("New Business ACV", "acv")}
-                      {renderEditableField("Price Book", "priceBook", true)}
-                      {renderEditableField("Opportunity Origin", "origin", false, false, true)}
+                      {renderEditableField("Quote Date", "quoteDate", { inputType: 'date', hasHelp: true, helpText: 'Date when the pricing proposal or quote was drafted.' })}
+                      {renderEditableField("Opportunity Origin", "origin", { hasHelp: true, helpText: 'Source or channel where the opportunity originated.' })}
+                      {renderEditableField("Quote Delivered", "quoteDelivered", { inputType: 'checkbox', hasHelp: true, helpText: 'Check if the quote has been successfully sent to the client.' })}
+                      {renderEditableField("Description", "description", { inputType: 'textarea', hasHelp: true, helpText: 'General overview or notes on the opportunity.' })}
+                      {renderEditableField("Decision Date", "decisionDate", { inputType: 'date', hasHelp: true, helpText: 'Target date for the client to make their final decision.' })}
+                      <div className="field-cell empty-placeholder" style={{ borderBottom: 'none' }}></div>
+                      {renderEditableField("Price Book", "priceBook", { isLink: true })}
                     </div>
                   </div>
 
@@ -962,16 +1114,91 @@ export default function Home() {
                       <p className="reasoning-text">{analysisResult.reasoning}</p>
                     </div>
 
-                    {analysisResult.coaching_feedback && analysisResult.coaching_feedback.length > 0 && (
-                      <div className="coaching-feedback-container" style={{ padding: '0.85rem', backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '6px' }}>
-                        <h4 style={{ color: '#1e40af', fontSize: '0.85rem', fontWeight: 'bold', margin: '0 0 0.5rem 0', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                          💡 Sales Coach Action Plan
-                        </h4>
-                        <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.8rem', color: '#1e3a8a', lineHeight: '1.5' }}>
-                          {analysisResult.coaching_feedback.map((tip, idx) => (
-                            <li key={idx} style={{ marginBottom: '0.4rem' }}>{tip}</li>
-                          ))}
-                        </ul>
+                    {analysisResult.coaching_playbook && analysisResult.coaching_playbook.length > 0 && (
+                      <div className="playbook-container">
+                        <div className="playbook-header">
+                          <h4 className="playbook-title">
+                            💡 Sales Coach Action Playbook
+                          </h4>
+                          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                            {analysisResult.coaching_playbook.length} recommended {analysisResult.coaching_playbook.length === 1 ? 'play' : 'plays'}
+                          </span>
+                        </div>
+                        {analysisResult.coaching_playbook.map((play, playIdx) => (
+                          <div key={play.gap_key || playIdx} className="playbook-card">
+                            <div className="playbook-card-header">
+                              <div className="playbook-gap-info">
+                                <span className="playbook-gap-label">⚠️ Missing Opportunity Data</span>
+                                <h3 className="playbook-gap-title">{play.missing_info}</h3>
+                              </div>
+                              <div className="playbook-badges">
+                                {play.target_contact && (
+                                  <span className="playbook-badge contact">
+                                    👤 {play.target_contact}
+                                  </span>
+                                )}
+                                {play.timing && (
+                                  <span className="playbook-badge time">
+                                    ⏱️ {play.timing}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            
+                            <div className="playbook-details-grid">
+                              <div className="playbook-section full-width">
+                                <span className="playbook-section-label">📢 AI Recommendation</span>
+                                <p className="playbook-section-content">{play.importance}</p>
+                              </div>
+                              
+                              <div className="playbook-section">
+                                <span className="playbook-section-label">🎯 Suggested Next Action</span>
+                                <p className="playbook-section-content" style={{ fontWeight: '600', color: 'var(--text-white)' }}>
+                                  {play.recommended_action}
+                                </p>
+                              </div>
+                              
+                              <div className="playbook-section">
+                                <span className="playbook-section-label">🤝 Desired Outcome</span>
+                                <p className="playbook-section-content">{play.desired_outcome}</p>
+                              </div>
+                              
+                              <div className="playbook-section full-width">
+                                <span className="playbook-section-label">💬 Suggested Discovery Questions & Approach</span>
+                                <p className="playbook-section-content" style={{ opacity: 0.85, marginBottom: '0.5rem', fontSize: '0.75rem' }}>
+                                  <em>Approach: {play.communication_guidance}</em>
+                                </p>
+                                {play.suggested_questions && play.suggested_questions.length > 0 && (
+                                  <div className="playbook-questions-list">
+                                    {play.suggested_questions.map((q, qIdx) => {
+                                      const key = `${play.gap_key || playIdx}-${qIdx}`;
+                                      const isCopied = copiedQuestionKey === key;
+                                      return (
+                                        <div 
+                                          key={qIdx} 
+                                          className="playbook-question-item"
+                                          onClick={() => handleCopyQuestion(q, key)}
+                                          title="Click to copy question to clipboard"
+                                        >
+                                          <span className="playbook-question-text">"{q}"</span>
+                                          <button className="playbook-copy-btn" type="button">
+                                            {isCopied ? (
+                                              <span className="playbook-copy-toast">Copied!</span>
+                                            ) : (
+                                              <svg style={{ width: '14px', height: '14px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                              </svg>
+                                            )}
+                                          </button>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     )}
 
